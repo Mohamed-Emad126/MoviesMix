@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+   <item
+        android:id="@id/popularFragment"
+        android:title="@string/popular"
+        android:icon="@drawable/ic_logo"/>
+
+    <item
+        android:id="@id/trendingFragment"
+        android:title="@string/trending_title"
+        android:icon="@drawable/trending"/>
+
+    <item
+        android:id="@id/upcomingFragment"
+        android:title="@string/upcoming_title"
+        android:icon="@drawable/coming"/>
+
+    <item
+        android:id="@id/favouritesFragment"
+        android:title="@string/favourite"
+        android:icon="@drawable/rated"/>
+
+</menu>

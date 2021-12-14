@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/popular_frame_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.popular.PopularFragment">
+
+    <com.liaoinstan.springview.widget.SpringView
+        android:id="@+id/spring_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:footer="@layout/loading_header"
+        app:header="@layout/loading_header">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/movies_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:saveEnabled="true"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/movie_popular_item" />
+    </com.liaoinstan.springview.widget.SpringView>
+
+    <include
+        android:id="@+id/loading_layout"
+        layout="@layout/loading_layout"
+        android:visibility="visible" />
+
+    <include
+        android:id="@+id/error_layout"
+        layout="@layout/error_layout"
+        android:visibility="gone" />
+
+</FrameLayout>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/popularFragment">
+
+    <fragment
+        android:id="@+id/popularFragment"
+        android:name="com.memad.moviesmix.ui.main.popular.PopularFragment"
+        android:label="fragment_popular"
+        tools:layout="@layout/fragment_popular" />
+    <fragment
+        android:id="@+id/trendingFragment"
+        android:name="com.memad.moviesmix.ui.main.trending.TrendingFragment"
+        android:label="fragment_trending"
+        tools:layout="@layout/fragment_trending" />
+    <fragment
+        android:id="@+id/upcomingFragment"
+        android:name="com.memad.moviesmix.ui.main.upcoming.UpcomingFragment"
+        android:label="fragment_upcoming"
+        tools:layout="@layout/fragment_upcoming" />
+    <fragment
+        android:id="@+id/favouritesFragment"
+        android:name="com.memad.moviesmix.ui.main.favourites.FavouritesFragment"
+        android:label="fragment_favourites"
+        tools:layout="@layout/fragment_favourites" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.memad.moviesmix.ui.main.search.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
+    <action
+        android:id="@+id/action_global_searchFragment"
+        app:destination="@id/searchFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.memad.moviesmix.ui.main.settings.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment" />
+</navigation>

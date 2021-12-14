@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:transitionGroup="true"
+    tools:context=".ui.main.trending.TrendingFragment">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/details_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <io.github.florent37.shapeofview.shapes.ArcView
+            android:id="@+id/arcView"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:elevation="8dp"
+            android:outlineProvider="bounds"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:shape_arc_height="-70dp"
+            app:shape_arc_position="top">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:background="@color/primaryLightColor" />
+        </io.github.florent37.shapeofview.shapes.ArcView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="@style/CircularProgressBar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginBottom="70dp"
+            android:background="@drawable/circle"
+            android:elevation="8dp"
+            android:progress="60"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/arcView"
+            app:layout_constraintStart_toStartOf="@+id/arcView" />
+
+        <TextView
+            android:id="@+id/progress_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="9dp"
+            android:text="7.6"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/material_on_surface_emphasis_high_type"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@+id/progress_bar"
+            app:layout_constraintEnd_toEndOf="@+id/progress_bar"
+            app:layout_constraintStart_toStartOf="@+id/progress_bar"
+            app:layout_constraintTop_toTopOf="@+id/progress_bar" />
+
+        <TextView
+            android:id="@+id/movie_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="10dp"
+            android:text="Avengers: Infinity wars"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/material_on_surface_emphasis_high_type"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/movie_genre"
+            app:layout_constraintEnd_toEndOf="@+id/arcView"
+            app:layout_constraintStart_toStartOf="@+id/arcView"
+            app:layout_constraintTop_toBottomOf="@+id/progress_bar" />
+
+        <TextView
+            android:id="@+id/movie_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="10dp"
+            android:text="FCI, Crime, Drama"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/material_on_surface_emphasis_medium"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/arcView"
+            app:layout_constraintEnd_toEndOf="@+id/arcView"
+            app:layout_constraintStart_toStartOf="@+id/arcView"
+            app:layout_constraintTop_toBottomOf="@+id/movie_name" />
+
+        <com.varunest.sparkbutton.SparkButton
+            android:id="@+id/spark_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/arcView"
+            app:layout_constraintStart_toStartOf="@id/arcView"
+            app:layout_constraintTop_toTopOf="@id/arcView"
+            app:sparkbutton_activeImage="@drawable/heart_active"
+            app:sparkbutton_iconSize="30dp"
+            app:sparkbutton_inActiveImage="@drawable/heart_inactive"
+            app:sparkbutton_primaryColor="@color/spark_primary_color" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

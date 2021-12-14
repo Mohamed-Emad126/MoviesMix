@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical|center_horizontal"
+    android:id="@+id/movie_card"
+    app:cardUseCompatPadding="true"
+    app:cardPreventCornerOverlap="false"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/poster_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/start_img_min"
+        app:shapeAppearanceOverlay="@style/popularImageShape" />
+
+    <FrameLayout
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:background="@drawable/heart_background"
+        android:layout_gravity="top|end"
+        >
+        <TextView
+            android:id="@+id/movie_rate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:text="7.7"
+            android:gravity="center|end"
+            android:textColor="@color/goldEndColor"
+            android:textSize="14sp"
+            app:drawableStartCompat="@drawable/star" />
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>

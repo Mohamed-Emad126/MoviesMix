@@ -1,0 +1,119 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+    id 'dagger.hilt.android.plugin'
+    id 'androidx.navigation.safeargs.kotlin'
+}
+
+android {
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.memad.moviesmix"
+        minSdkVersion 21
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+    }
+    ndkVersion '22.1.7171670'
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+
+    //coroutines
+    def coroutines_version = "1.5.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+
+    //room
+    def roomVersion = "2.4.0-rc01"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:2.3.0")
+
+    //Retrofit and OkHttp3
+    def retrofit_version = "2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
+    // sandwich
+    implementation "com.github.skydoves:sandwich:1.2.2"
+
+    //ViewModel-ktx
+    def lifecycle_version = "2.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+    //KTX
+    implementation "androidx.fragment:fragment-ktx:1.4.0"
+    implementation "androidx.activity:activity-ktx:1.4.0"
+
+    //Navigation Component
+    def nav_version = "2.3.5"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    //Dagger-Hilt
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
+    //WorkManager-KTX
+    def work_version = "2.7.1"
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    //Coil
+    implementation("io.coil-kt:coil:1.4.0")
+
+    //lottie
+    def lottieVersion = "4.2.2"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    //PhotoView
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    //SmoothBottomBar
+    implementation 'com.github.ibrahimsn98:SmoothBottomBar:1.7.8'
+    //ShapeOfView
+    implementation 'io.github.florent37:shapeofview:1.4.7'
+    //SparkButton
+    implementation 'com.github.varunest:sparkbutton:1.0.6'
+    //SpringView
+    implementation 'com.liaoinstan.springview:library:1.7.0'
+    //Security-Crypto
+    implementation 'androidx.security:security-crypto:1.1.0-alpha01'
+}

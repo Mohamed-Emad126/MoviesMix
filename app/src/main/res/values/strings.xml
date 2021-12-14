@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">MoviesMix</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="get_your_popcorn">Get your popcorn and let\'s choose a movie</string>
+    <string name="start">GETTING STARTED</string>
+    <string name="loading">Loading</string>
+    <string name="next">Next</string>
+    <string name="start1">Start</string>
+    <string name="skip">Skip</string>
+    <string name="welcome">Welcome to Movies Mix\nBe ready, get your popcorn and let us choose a movie</string>
+    <string name="trending">Now you can find the current trending movies easily</string>
+    <string name="upcoming">See and find the upcoming movies and rate it now</string>
+    <string name="trending_movies">Trending Movies</string>
+    <string name="upcoming_movies">Upcoming Movies</string>
+    <string name="popular">Popular</string>
+    <string name="trending_title">Trends</string>
+    <string name="upcoming_title">Upcoming</string>
+    <string name="favourite">Favourites</string>
+    <string name="refresh">Refresh</string>
+    <string name="something_went_wrong">Something went wrong!</string>
+    <string name="no_network">No network connection!</string>
+</resources>
