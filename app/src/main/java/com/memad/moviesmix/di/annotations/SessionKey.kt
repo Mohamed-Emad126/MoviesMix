@@ -1,4 +1,4 @@
-package com.memad.moviesmix.di
+package com.memad.moviesmix.di.annotations
 
 import javax.inject.Qualifier
 

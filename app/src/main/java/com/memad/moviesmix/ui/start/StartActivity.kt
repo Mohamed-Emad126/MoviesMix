@@ -5,9 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.memad.moviesmix.R
-import com.memad.moviesmix.databinding.ActivityMainBinding
 import com.memad.moviesmix.databinding.ActivityStartBinding
-import com.memad.moviesmix.di.SessionKey
+import com.memad.moviesmix.di.annotations.SessionKey
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import android.content.Intent

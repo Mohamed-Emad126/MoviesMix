@@ -1,10 +1,10 @@
-package com.memad.moviesmix.ui.main.popular
+package com.memad.moviesmix.repos
 
 import android.util.Log
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.data.local.MoviesDao
 import com.memad.moviesmix.data.remote.MoviesClient
-import com.memad.moviesmix.ui.main.MainRepo
+import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.utils.AccessNative
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Resource
@@ -17,11 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-class PopularRepo @Inject constructor(
+class MainRepoImpl @Inject constructor(
     private val moviesDao: MoviesDao,
     private val moviesClient: MoviesClient,
+    private val type: Int
 ) : MainRepo {
-    private val type: Int = Constants.POPULAR
 
     override suspend fun favouriteAMovie(movie: MovieEntity) {
         moviesDao.insertFavouriteMovie(movie)
@@ -34,19 +34,22 @@ class PopularRepo @Inject constructor(
     override suspend fun getAllMovies(
         page: Int
     ) = flow {
-        val response = moviesClient.getPopularMovies(AccessNative.getApiKey(), page)
+        val response = when(type){
+            Constants.POPULAR -> moviesClient.getPopularMovies(AccessNative.getApiKey(), page)
+            Constants.UPCOMING -> moviesClient.getTrendingMovies(AccessNative.getApiKey(), page)
+            Constants.TRENDING -> moviesClient.getUpcomingMovies(AccessNative.getApiKey(), page)
+            else -> moviesClient.getPopularMovies(AccessNative.getApiKey(), page)
+        }
         val cachedMovies = moviesDao.getAllMovies(type, page).first()
+
         response.suspendOnSuccess(SuccessMoviesMapper(type)) {
             moviesDao.deleteMovies(type, page)
             moviesDao.insertMovies(this)
             val allMovies = moviesDao.getAllMovies(type, page).first()
-            Log.i("TAG: pop repo:", "${this.size} :-> ${allMovies.size}")
             emit(Resource.Success(allMovies))
         }.suspendOnError {
-            Log.i("TAG: pop repo:", "onError :-> ${cachedMovies.size}")
             emit(Resource.Error(message(), cachedMovies))
         }.suspendOnFailure {
-            Log.i("TAG: pop repo:", "onFailure :-> ${cachedMovies.size}")
             emit(Resource.Error(this, cachedMovies))
         }
     }.flowOn(Dispatchers.IO)

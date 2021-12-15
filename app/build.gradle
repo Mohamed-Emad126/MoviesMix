@@ -103,7 +103,10 @@ dependencies {
     //lottie
     def lottieVersion = "4.2.2"
     implementation "com.airbnb.android:lottie:$lottieVersion"
-
+    //DiscreteScrollView
+    implementation 'com.yarolegovich:discrete-scrollview:1.5.1'
+    //VeilLayout
+    implementation "com.github.skydoves:androidveil:1.1.2"
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     //SmoothBottomBar

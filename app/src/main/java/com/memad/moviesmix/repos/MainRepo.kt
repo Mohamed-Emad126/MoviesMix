@@ -1,4 +1,4 @@
-package com.memad.moviesmix.ui.main
+package com.memad.moviesmix.repos
 
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.models.MoviesResponse

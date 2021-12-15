@@ -1,4 +1,4 @@
-package com.memad.moviesmix.ui.main.popular
+package com.memad.moviesmix.ui.main.trending
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.di.annotations.PopularRepo
+import com.memad.moviesmix.di.annotations.TrendingRepo
 import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl: MainRepo) :
+class TrendingViewModel @Inject constructor(@TrendingRepo private val mainRepoImpl: MainRepo) :
     ViewModel() {
 
     private val currentPage = MutableLiveData(1)
@@ -47,12 +48,10 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
                     moviesListLiveData.value = moviesListLiveData.value
                 }
                 _isFirstLoading.emit(false)
-                Log.i("TAG: pop VIM:", "before_moviesList :-> ${moviesListLiveData.value?.size}")
                 if (!it.data.isNullOrEmpty()) {
-                    Log.i("TAG: pop VIM:", "isNullOrEmpty :-> ${it.data.size}")
                     moviesListLiveData.value?.addAll(it.data)
+                    moviesListLiveData.value?.add(it.data.last())
                     _moviesList.emit(moviesListLiveData.value!!)
-                    Log.i("TAG: pop VIM:", "after_moviesList :-> ${moviesListLiveData.value?.size}")
                 }
                 _moviesResource.emit(it)
             }
