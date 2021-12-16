@@ -14,9 +14,12 @@ data class MovieEntity(
     val movieId: Int?,
     @ColumnInfo(name = "movie_type") val movieType: Int,
     @ColumnInfo(name = "movie_page") val moviePage: Int,
-    @ColumnInfo(name = "movie") val movie: MoviesResponse.Result
+    @ColumnInfo(name = "movie") val movie: MoviesResponse.Result?
 ) {
 
     @Ignore
-    constructor(type: Int, page: Int, movie: MoviesResponse.Result) : this(null, type, page, movie)
+    constructor(type: Int, page: Int, movie: MoviesResponse.Result?) : this(
+        null, type, page,
+        movie
+    )
 }

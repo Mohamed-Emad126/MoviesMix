@@ -176,7 +176,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
     override fun onMovieHoldDown(position: Int) {
         posterDialogBinding.posterDialogImage
             .load(Constants.POSTER_BASE_URL +
-                    popularAdapter.popularMoviesList[position].movie.poster_path){
+                    popularAdapter.popularMoviesList[position].movie?.poster_path){
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)

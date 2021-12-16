@@ -15,34 +15,35 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:scaleType="fitXY"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraitntSart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <com.yarolegovich.discretescrollview.DiscreteScrollView
+        android:id="@+id/discrete_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingBottom="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/movie_trend_item" />
+
     <TextView
+        android:id="@+id/header_text"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
         android:gravity="center"
         android:paddingTop="20sp"
         android:shadowColor="@color/with_alpha"
-        android:text="Trending Movies Today"
+        android:text="@string/trending_movies_today"
         android:textColor="@color/goldStartColor"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraitntSart_toStartOf="parent" />
-
-
-    <com.yarolegovich.discretescrollview.DiscreteScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/movie_trend_item" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/details_layout"
@@ -78,7 +79,8 @@
             android:layout_marginBottom="70dp"
             android:background="@drawable/circle"
             android:elevation="8dp"
-            android:progress="60"
+            android:max="1000"
+            android:progress="0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/arcView"
             app:layout_constraintStart_toStartOf="@+id/arcView" />
@@ -88,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="9dp"
-            android:text="7.6"
+            android:text=""
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@color/material_on_surface_emphasis_high_type"
             android:textSize="20sp"
@@ -104,7 +106,7 @@
             android:elevation="10dp"
             android:lines="1"
             android:maxLines="1"
-            android:text="Avengers: Infinity wars"
+            android:text="@string/loading"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@color/material_on_surface_emphasis_high_type"
             android:textSize="20sp"
@@ -121,6 +123,7 @@
             android:elevation="10dp"
             android:lines="1"
             android:maxLines="1"
+            android:visibility="gone"
             android:text="FCI, Crime, Drama"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@color/material_on_surface_emphasis_medium"
@@ -132,6 +135,7 @@
 
         <com.varunest.sparkbutton.SparkButton
             android:id="@+id/spark_button"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="10dp"
@@ -148,6 +152,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="10dp"
+            android:visibility="gone"
             android:padding="24dp"
             android:text="1998"
             android:textColor="@color/spark_primary_color"

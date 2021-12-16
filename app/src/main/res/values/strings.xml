@@ -21,4 +21,6 @@
     <string name="refresh">Refresh</string>
     <string name="something_went_wrong">Something went wrong!</string>
     <string name="no_network">No network connection!</string>
+    <string name="trending_header">Trending movies today</string>
+    <string name="trending_movies_today">Trending Movies Today</string>
 </resources>

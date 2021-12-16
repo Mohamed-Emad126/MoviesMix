@@ -1,10 +1,8 @@
 package com.memad.moviesmix.repos
 
-import android.util.Log
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.data.local.MoviesDao
 import com.memad.moviesmix.data.remote.MoviesClient
-import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.utils.AccessNative
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Resource
@@ -14,7 +12,9 @@ import com.skydoves.sandwich.suspendOnError
 import com.skydoves.sandwich.suspendOnFailure
 import com.skydoves.sandwich.suspendOnSuccess
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class MainRepoImpl @Inject constructor(

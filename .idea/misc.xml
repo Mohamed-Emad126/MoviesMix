@@ -5,6 +5,7 @@
       <map>
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/circle.xml" value="0.240625" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/error_layout.xml" value="0.23692307692307693" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/grad.xml" value="0.25" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/heart_active.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/heart_background.xml" value="0.240625" />
@@ -20,6 +21,7 @@
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/settings.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/splash_background.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/start_background.xml" value="0.240625" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/start_img_min_broken.xml" value="0.23692307692307693" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/trending.xml" value="0.22037037037037038" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/activity_start.xml" value="0.1" />
@@ -30,13 +32,13 @@
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_search.xml" value="0.25" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_settings.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_start.xml" value="0.25" />
-        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_trending.xml" value="0.2" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_trending.xml" value="0.22" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_upcoming.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/loading_dialog.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/loading_header.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/loading_layout.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/movie_popular_item.xml" value="0.25" />
-        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/movie_trend_item.xml" value="0.22" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/movie_trend_item.xml" value="0.2" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/poster_dialog.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/menu/bottom_bar_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/menu/toolbar_menu.xml" value="0.22447916666666667" />

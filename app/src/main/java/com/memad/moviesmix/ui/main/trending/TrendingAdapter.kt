@@ -7,19 +7,24 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
-import com.memad.moviesmix.databinding.MoviePopularItemBinding
 import com.memad.moviesmix.databinding.MovieTrendItemBinding
 import com.memad.moviesmix.utils.Constants
-import com.memad.moviesmix.utils.DoubleClickListener
 import javax.inject.Inject
 
 class TrendingAdapter @Inject constructor() :
     RecyclerView.Adapter<TrendingAdapter.TrendingViewHolder>() {
+    companion object {
+        private const val ERROR_STATUS_ID = -2
+        private const val LOADING_STATUS_ID = -1
+    }
+
     lateinit var trendingMovieClickListener: OnMoviesClickListener
     var trendingMoviesList: MutableList<MovieEntity> = mutableListOf()
         set(value) {
+            deleteLastItem()
             if (field.isNullOrEmpty()) {
                 field = value
+                notifyDataSetChanged()
             } else {
                 val lastFinish = field.size
                 field = value
@@ -27,8 +32,24 @@ class TrendingAdapter @Inject constructor() :
             }
         }
 
-    fun deleteLastItem(){
-        trendingMoviesList.removeAt(trendingMoviesList.size-1)
+    private fun deleteLastItem() {
+        trendingMoviesList.removeLastOrNull()
+    }
+
+    fun addErrorItem() {
+        deleteLastItem()
+        trendingMoviesList.add(
+            MovieEntity(ERROR_STATUS_ID, 0, null)
+        )
+        notifyItemChanged(trendingMoviesList.size)
+    }
+
+    fun addLoadingItem() {
+        deleteLastItem()
+        trendingMoviesList.add(
+            MovieEntity(LOADING_STATUS_ID, 0, null)
+        )
+        notifyItemInserted(trendingMoviesList.size)
     }
 
     /////////////////////////////////////////////////////////////////
@@ -45,20 +66,28 @@ class TrendingAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: TrendingViewHolder, position: Int) {
-        if(position == trendingMoviesList.size-1){
-            holder.itemBinding.itemVeilLayout.veil()
-        }
-        else{
-            holder.itemBinding.itemVeilLayout.unVeil()
-            holder.itemBinding.posterImage
-                .load(
-                    Constants.POSTER_BASE_URL +
-                            trendingMoviesList[position].movie.poster_path
-                ) {
+        when (trendingMoviesList[position].movieId) {
+            LOADING_STATUS_ID -> {
+                holder.itemBinding.itemVeilLayout.veil()
+            }
+            ERROR_STATUS_ID -> {
+                holder.itemBinding.itemVeilLayout.unVeil()
+                holder.itemBinding.posterImage.load(R.drawable.ic_robot_broken) {
                     crossfade(true)
-                    placeholder(R.drawable.start_img_min_blur)
-                    error(R.drawable.start_img_min_broken)
                 }
+            }
+            else -> {
+                holder.itemBinding.itemVeilLayout.unVeil()
+                holder.itemBinding.posterImage
+                    .load(
+                        Constants.POSTER_BASE_URL +
+                                trendingMoviesList[position].movie?.poster_path
+                    ) {
+                        crossfade(true)
+                        placeholder(R.drawable.start_img_min_blur)
+                        error(R.drawable.start_img_min_broken)
+                    }
+            }
         }
     }
 
@@ -76,8 +105,15 @@ class TrendingAdapter @Inject constructor() :
     inner class TrendingViewHolder(val itemBinding: MovieTrendItemBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
         init {
-            itemBinding.posterImage.setOnClickListener{
-                trendingMovieClickListener.onMovieClicked(adapterPosition, itemBinding.posterImage)
+            itemBinding.materialCardView.setOnClickListener {
+                if (trendingMoviesList[adapterPosition].movieId == ERROR_STATUS_ID) {
+                    trendingMovieClickListener.onMovieErrorStateClicked(adapterPosition)
+                } else {
+                    trendingMovieClickListener.onMovieClicked(
+                        adapterPosition,
+                        itemBinding.posterImage
+                    )
+                }
             }
 
 
@@ -90,5 +126,6 @@ class TrendingAdapter @Inject constructor() :
     /////////////////////////////////////////////////////////////////
     interface OnMoviesClickListener {
         fun onMovieClicked(position: Int, imageView: ImageView?)
+        fun onMovieErrorStateClicked(position: Int)
     }
 }

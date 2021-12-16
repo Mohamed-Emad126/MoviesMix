@@ -44,14 +44,14 @@ class PopularAdapter @Inject constructor() :
         holder.itemBinding.posterImage
             .load(
                 Constants.POSTER_BASE_URL +
-                        popularMoviesList[position].movie.poster_path
+                        popularMoviesList[position].movie?.poster_path
             ) {
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)
             }
         holder.itemBinding.movieRate.text =
-            popularMoviesList[position].movie.vote_average.toString()
+            popularMoviesList[position].movie?.vote_average.toString()
     }
 
     override fun getItemCount(): Int {
