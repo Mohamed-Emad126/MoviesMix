@@ -50,10 +50,12 @@ class TrendingViewModel @Inject constructor(@TrendingRepo private val mainRepoIm
     }
 
     fun loadNextPage() {
-        currentPage.value = moviesListLiveData.value?.last()?.moviePage!! + 1
+        currentPage.value =
+            moviesListLiveData.value?.get(moviesListLiveData.value?.size!! - 2)?.moviePage!! + 1
         getMovies(currentPage.value!!)
     }
-    fun reload(){
+
+    fun reload() {
         currentPage.value = moviesListLiveData.value?.last()?.moviePage!!
         getMovies(currentPage.value!!)
     }

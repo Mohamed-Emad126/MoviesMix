@@ -1,41 +1,45 @@
 package com.memad.moviesmix.ui.main.trending
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import coil.load
+import coil.transform.BlurTransformation
 import com.google.android.material.transition.MaterialFadeThrough
 import com.memad.moviesmix.R
+import com.memad.moviesmix.databinding.FragmentTrendingBinding
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.NetworkStatus
 import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import com.yarolegovich.discretescrollview.DiscreteScrollView
+import com.yarolegovich.discretescrollview.transform.ScaleTransformer
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import android.view.animation.DecelerateInterpolator
-import android.animation.ObjectAnimator
-import android.widget.Toast
-import coil.transform.BlurTransformation
-import com.memad.moviesmix.databinding.FragmentTrendingBinding
-import com.yarolegovich.discretescrollview.transform.ScaleTransformer
 
 
 @AndroidEntryPoint
 class TrendingFragment : Fragment(),
     DiscreteScrollView.ScrollStateChangeListener<TrendingAdapter.TrendingViewHolder>,
-    TrendingAdapter.OnMoviesClickListener,
-    DiscreteScrollView.OnItemChangedListener<TrendingAdapter.TrendingViewHolder> {
+    TrendingAdapter.OnMoviesClickListener {
 
+    @Volatile private var lastSize: Int = 0
+    private val TAG: String = "TRENDS"
     private var error: String = ""
 
     @Inject
@@ -81,7 +85,9 @@ class TrendingFragment : Fragment(),
                 .setMinScale(0.8f)
                 .build()
         )
+        binding.discreteScrollView.setSlideOnFling(true)
         binding.discreteScrollView.adapter = trendingAdapter
+        trendingAdapter.addLoadingItem(0)
     }
 
 
@@ -98,16 +104,22 @@ class TrendingFragment : Fragment(),
         })
         lifecycleScope.launchWhenStarted {
             trendingViewModel.moviesResource.collect {
-                when (it) {
-                    is Resource.Loading -> loading()
-                    is Resource.Error -> error()
-                    is Resource.Success -> success()
+                Log.d(TAG, "setupObservables: $it")
+                withContext(Dispatchers.Main) {
+                    when (it) {
+                        is Resource.Loading -> loading()
+                        is Resource.Error -> error()
+                        is Resource.Success -> success()
+                    }
                 }
             }
         }
         lifecycleScope.launchWhenStarted {
             trendingViewModel.moviesList.collectLatest {
+                lastSize = trendingAdapter.trendingMoviesList.size - 1
+                success()
                 trendingAdapter.trendingMoviesList = it
+                handleDetailsUi(lastSize)
             }
         }
     }
@@ -133,7 +145,6 @@ class TrendingFragment : Fragment(),
     }
 
     private fun loading() {
-        trendingAdapter.addLoadingItem()
         binding.movieName.text = getString(R.string.loading)
         binding.movieGenre.visibility = GONE
         binding.sparkButton.visibility = GONE
@@ -169,12 +180,12 @@ class TrendingFragment : Fragment(),
                 binding.progressBar.progress,
                 voteAverage.toInt() * 100
             )
-        animation.duration = 1500
+        animation.duration = 1000
         animation.setAutoCancel(true)
         animation.interpolator = DecelerateInterpolator()
         animation.addUpdateListener {
             binding.progressPercent.text =
-                    (it.getAnimatedValue("progress") as Int).toFloat().div(100.0).toString()
+                (it.getAnimatedValue("progress") as Int).toFloat().div(100.0).toString()
         }
         animation.start()
     }
@@ -194,32 +205,35 @@ class TrendingFragment : Fragment(),
         loading()
     }
 
-    override fun onCurrentItemChanged(
-        viewHolder: TrendingAdapter.TrendingViewHolder?,
-        adapterPosition: Int
-    ) {
-        if (adapterPosition == trendingAdapter.trendingMoviesList.size - 1) {
-            trendingViewModel.loadNextPage()
-        }
-    }
-
     override fun onScrollStart(
         currentItemHolder: TrendingAdapter.TrendingViewHolder,
         adapterPosition: Int
     ) {
-        loading()
+        Log.i(TAG, "onScrollStart: ")
+        if (adapterPosition == trendingAdapter.trendingMoviesList.size - 1) {
+            loading()
+        } else {
+            handleDetailsUi(adapterPosition)
+            success()
+        }
     }
 
     override fun onScrollEnd(
         currentItemHolder: TrendingAdapter.TrendingViewHolder,
         adapterPosition: Int
     ) {
-        handleDetailsUi(adapterPosition)
-        success()
+        Log.i(TAG, "onScrollEnd: ")
+        if (adapterPosition == trendingAdapter.trendingMoviesList.size - 1) {
+            loading()
+            trendingViewModel.loadNextPage()
+        } else {
+            handleDetailsUi(adapterPosition)
+            success()
+        }
     }
 
     override fun onMovieClicked(position: Int, imageView: ImageView?) {
-        Toast.makeText(context, "${position.toString()} Clicked", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "$position Clicked", Toast.LENGTH_SHORT).show()
     }
 
     override fun onMovieErrorStateClicked(position: Int) {

@@ -21,32 +21,30 @@ class TrendingAdapter @Inject constructor() :
     lateinit var trendingMovieClickListener: OnMoviesClickListener
     var trendingMoviesList: MutableList<MovieEntity> = mutableListOf()
         set(value) {
-            deleteLastItem()
+            field.removeLastOrNull()
+            notifyItemRemoved(field.size - 1)
             if (field.isNullOrEmpty()) {
                 field = value
-                notifyDataSetChanged()
             } else {
                 val lastFinish = field.size
                 field = value
                 notifyItemRangeInserted(lastFinish, 20)
             }
+            field.add(field.size,
+                MovieEntity(LOADING_STATUS_ID, 0, null)
+            )
+            notifyItemInserted(field.size)
         }
 
-    private fun deleteLastItem() {
-        trendingMoviesList.removeLastOrNull()
-    }
-
     fun addErrorItem() {
-        deleteLastItem()
         trendingMoviesList.add(
             MovieEntity(ERROR_STATUS_ID, 0, null)
         )
-        notifyItemChanged(trendingMoviesList.size)
+        notifyItemChanged(trendingMoviesList.size-1)
     }
 
-    fun addLoadingItem() {
-        deleteLastItem()
-        trendingMoviesList.add(
+    fun addLoadingItem(position: Int) {
+        trendingMoviesList.add(position,
             MovieEntity(LOADING_STATUS_ID, 0, null)
         )
         notifyItemInserted(trendingMoviesList.size)
@@ -66,7 +64,7 @@ class TrendingAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: TrendingViewHolder, position: Int) {
-        when (trendingMoviesList[position].movieId) {
+        when (trendingMoviesList[position].movieType) {
             LOADING_STATUS_ID -> {
                 holder.itemBinding.itemVeilLayout.veil()
             }

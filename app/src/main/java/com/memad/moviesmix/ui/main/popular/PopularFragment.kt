@@ -107,6 +107,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         }
         lifecycleScope.launchWhenStarted {
             popularViewModel.moviesList.collectLatest {
+                //TODO: FIX this and observe on moviesListLiveData
                 Log.i("TAG: pop fragB:", "${it.size} :-> ${popularAdapter.popularMoviesList.size}")
                 popularAdapter.popularMoviesList = it
                 Log.i("TAG: pop fragA:", "${it.size} :-> ${popularAdapter.popularMoviesList.size}")
