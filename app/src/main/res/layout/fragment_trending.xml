@@ -11,27 +11,30 @@
         android:id="@+id/backdrop_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/start_img_min_blur"
-        app:layout_constraintEnd_toEndOf="parent"
         android:scaleType="fitXY"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <com.yarolegovich.discretescrollview.DiscreteScrollView
-        android:id="@+id/discrete_scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:src="@drawable/start_img_min_blur"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:paddingBottom="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/discrete_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:orientation="horizontal"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/movie_trend_item" />
 
     <TextView
         android:id="@+id/header_text"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -41,9 +44,10 @@
         android:textColor="@color/goldStartColor"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/details_layout"
@@ -123,11 +127,11 @@
             android:elevation="10dp"
             android:lines="1"
             android:maxLines="1"
-            android:visibility="gone"
             android:text="FCI, Crime, Drama"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@color/material_on_surface_emphasis_medium"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/arcView"
             app:layout_constraintEnd_toEndOf="@+id/arcView"
             app:layout_constraintStart_toStartOf="@+id/arcView"
@@ -135,10 +139,10 @@
 
         <com.varunest.sparkbutton.SparkButton
             android:id="@+id/spark_button"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="10dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/arcView"
             app:layout_constraintStart_toStartOf="@id/arcView"
             app:layout_constraintTop_toTopOf="@id/arcView"
@@ -152,11 +156,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="10dp"
-            android:visibility="gone"
             android:padding="24dp"
             android:text="1998"
             android:textColor="@color/spark_primary_color"
             android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/arcView"
             app:layout_constraintEnd_toEndOf="@+id/arcView"
             app:layout_constraintTop_toTopOf="@+id/arcView" />

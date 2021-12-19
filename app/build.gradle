@@ -55,6 +55,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
 
 
     //coroutines
@@ -103,8 +104,6 @@ dependencies {
     //lottie
     def lottieVersion = "4.2.2"
     implementation "com.airbnb.android:lottie:$lottieVersion"
-    //DiscreteScrollView
-    implementation 'com.yarolegovich:discrete-scrollview:1.5.1'
     //VeilLayout
     implementation "com.github.skydoves:androidveil:1.1.2"
     //PhotoView

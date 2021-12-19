@@ -8,23 +8,24 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.BlurTransformation
 import com.google.android.material.transition.MaterialFadeThrough
 import com.memad.moviesmix.R
+import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentTrendingBinding
-import com.memad.moviesmix.utils.Constants
-import com.memad.moviesmix.utils.NetworkStatus
-import com.memad.moviesmix.utils.NetworkStatusHelper
-import com.memad.moviesmix.utils.Resource
-import com.yarolegovich.discretescrollview.DiscreteScrollView
-import com.yarolegovich.discretescrollview.transform.ScaleTransformer
+import com.memad.moviesmix.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -35,10 +36,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TrendingFragment : Fragment(),
-    DiscreteScrollView.ScrollStateChangeListener<TrendingAdapter.TrendingViewHolder>,
-    TrendingAdapter.OnMoviesClickListener {
+    TrendingAdapter.OnMoviesClickListener, LoadingAdapter.OnLoadingAdapterClickListener {
 
-    @Volatile private var lastSize: Int = 0
+    private lateinit var snapHelper: LinearSnapHelper
+    private lateinit var concatAdapter: ConcatAdapter
+
+    @Volatile
+    private var lastSize: Int = 0
     private val TAG: String = "TRENDS"
     private var error: String = ""
 
@@ -47,6 +51,10 @@ class TrendingFragment : Fragment(),
 
     @Inject
     lateinit var trendingAdapter: TrendingAdapter
+
+    @Inject
+    lateinit var loadingAdapter: LoadingAdapter
+    private lateinit var layoutManager: LinearLayoutManager
     private val trendingViewModel by viewModels<TrendingViewModel>()
     private var _binding: FragmentTrendingBinding? = null
     private val binding get() = _binding!!
@@ -77,17 +85,37 @@ class TrendingFragment : Fragment(),
     }
 
     private fun setupDiscreteScrollView() {
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.discreteScrollView.layoutManager = layoutManager
+        concatAdapter = ConcatAdapter(trendingAdapter, loadingAdapter)
         trendingAdapter.trendingMovieClickListener = this
-        binding.discreteScrollView.addScrollStateChangeListener(this)
-        binding.discreteScrollView.setItemTransformer(
-            ScaleTransformer.Builder()
-                .setMaxScale(1.25f)
-                .setMinScale(0.8f)
-                .build()
-        )
-        binding.discreteScrollView.setSlideOnFling(true)
-        binding.discreteScrollView.adapter = trendingAdapter
-        trendingAdapter.addLoadingItem(0)
+        loadingAdapter.errorClickListener = this
+        snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(binding.discreteScrollView)
+        binding.discreteScrollView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                val viewHolder: RecyclerView.ViewHolder? =
+                    binding.discreteScrollView.findViewHolderForAdapterPosition(
+                        snapHelper.getSnapPosition(recyclerView)
+                    )
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView
+                        .apply {
+                            animate().setDuration(300).scaleX(1F).scaleY(1F)
+                                .setInterpolator(AccelerateInterpolator()).start()
+                        }
+                    snapPositionChange(snapHelper.getSnapPosition(recyclerView))
+                } else {
+                    (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView
+                        .apply {
+                            animate().setDuration(300).scaleX(.75F).scaleY(.75F)
+                                .setInterpolator(AccelerateInterpolator()).start()
+                        }
+                }
+            }
+        })
+        binding.discreteScrollView.adapter = concatAdapter
     }
 
 
@@ -108,7 +136,7 @@ class TrendingFragment : Fragment(),
                 withContext(Dispatchers.Main) {
                     when (it) {
                         is Resource.Loading -> loading()
-                        is Resource.Error -> error()
+                        is Resource.Error -> error(list = it.data!!)
                         is Resource.Success -> success()
                     }
                 }
@@ -116,27 +144,33 @@ class TrendingFragment : Fragment(),
         }
         lifecycleScope.launchWhenStarted {
             trendingViewModel.moviesList.collectLatest {
-                lastSize = trendingAdapter.trendingMoviesList.size - 1
+                lastSize = trendingAdapter.trendingMoviesList.size
                 success()
+                Log.i(TAG, "setupObservables: ${it.size}")
                 trendingAdapter.trendingMoviesList = it
-                handleDetailsUi(lastSize)
+                if (lastSize == 0) {
+                    handleDetailsUi(lastSize)
+                }
             }
         }
     }
 
-    private fun error() {
-        trendingAdapter.addErrorItem()
-        binding.movieName.text = error
-        binding.headerText.visibility = GONE
-        binding.movieGenre.visibility = GONE
-        binding.sparkButton.visibility = GONE
-        binding.releaseYear.visibility = GONE
-        binding.backdropImage.load(R.drawable.start_img_min_blur)
-        binding.progressPercent.text = ""
-        binding.progressBar.progress = 0
+    private fun error(list: List<MovieEntity>) {
+        if (list.isNullOrEmpty()) {
+            loadingAdapter.error()
+            binding.movieName.text = error
+            binding.headerText.visibility = GONE
+            binding.movieGenre.visibility = GONE
+            binding.sparkButton.visibility = GONE
+            binding.releaseYear.visibility = GONE
+            binding.backdropImage.load(R.drawable.start_img_min_blur)
+            binding.progressPercent.text = ""
+            binding.progressBar.progress = 0
+        }
     }
 
     private fun success() {
+        loadingAdapter.loading()
         binding.headerText.text = getString(R.string.trending_header)
         binding.headerText.visibility = VISIBLE
         binding.movieGenre.visibility = VISIBLE
@@ -145,6 +179,7 @@ class TrendingFragment : Fragment(),
     }
 
     private fun loading() {
+        loadingAdapter.loading()
         binding.movieName.text = getString(R.string.loading)
         binding.movieGenre.visibility = GONE
         binding.sparkButton.visibility = GONE
@@ -195,48 +230,22 @@ class TrendingFragment : Fragment(),
         _binding = null
     }
 
-    override fun onScroll(
-        scrollPosition: Float,
-        currentPosition: Int,
-        newPosition: Int,
-        currentHolder: TrendingAdapter.TrendingViewHolder?,
-        newCurrent: TrendingAdapter.TrendingViewHolder?
-    ) {
-        loading()
-    }
-
-    override fun onScrollStart(
-        currentItemHolder: TrendingAdapter.TrendingViewHolder,
-        adapterPosition: Int
-    ) {
-        Log.i(TAG, "onScrollStart: ")
-        if (adapterPosition == trendingAdapter.trendingMoviesList.size - 1) {
-            loading()
-        } else {
-            handleDetailsUi(adapterPosition)
-            success()
-        }
-    }
-
-    override fun onScrollEnd(
-        currentItemHolder: TrendingAdapter.TrendingViewHolder,
-        adapterPosition: Int
-    ) {
-        Log.i(TAG, "onScrollEnd: ")
-        if (adapterPosition == trendingAdapter.trendingMoviesList.size - 1) {
-            loading()
-            trendingViewModel.loadNextPage()
-        } else {
-            handleDetailsUi(adapterPosition)
-            success()
-        }
-    }
-
     override fun onMovieClicked(position: Int, imageView: ImageView?) {
         Toast.makeText(context, "$position Clicked", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onMovieErrorStateClicked(position: Int) {
+    override fun onMovieErrorStateClicked() {
         trendingViewModel.reload()
     }
+
+    fun snapPositionChange(position: Int) {
+        Log.i(TAG, "onScrollEnd: ")
+        if (position == trendingAdapter.trendingMoviesList.size - 1) {
+            trendingViewModel.loadNextPage()
+        } else {
+            handleDetailsUi(position)
+            success()
+        }
+    }
+
 }

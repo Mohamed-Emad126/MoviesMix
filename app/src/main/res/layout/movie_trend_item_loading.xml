@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.skydoves.androidveil.VeilLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/item_veilLayout"
+    android:id="@+id/item_loading_veilLayout"
     android:layout_width="260dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/material_card_view"
+            android:id="@+id/material_loading_card_view"
             android:layout_width="260dp"
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
