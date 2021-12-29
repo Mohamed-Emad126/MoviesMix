@@ -63,10 +63,10 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
     //room
-    def roomVersion = "2.4.0-rc01"
+    def roomVersion = "2.4.0"
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
-    implementation("androidx.room:room-ktx:2.3.0")
+    implementation("androidx.room:room-ktx:$roomVersion")
 
     //Retrofit and OkHttp3
     def retrofit_version = "2.9.0"

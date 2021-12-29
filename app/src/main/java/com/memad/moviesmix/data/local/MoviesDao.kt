@@ -20,6 +20,9 @@ interface MoviesDao {
     @Query("DELETE FROM MOVIE_TABLE WHERE movie_type = 3 AND Movie_id = :movieId")
     suspend fun deleteFavouriteMovie(movieId: Int): Int
 
+    @Query("SELECT EXISTS(SELECT 1 FROM MOVIE_TABLE WHERE movie_type= 3 AND movie LIKE '%' || '\"id\": ' || :apiMovieId || '%' )")
+    suspend fun checkIsFavourite(apiMovieId: Int): Int
+
     @Query("SELECT * FROM MOVIE_TABLE WHERE movie_type = :type AND movie_page =:page")
     fun getAllMovies(type: Int, page: Int): Flow<List<MovieEntity>>
 
