@@ -23,4 +23,16 @@
     <string name="no_network">No network connection!</string>
     <string name="trending_header">Trending movies today</string>
     <string name="trending_movies_today">Trending Movies Today</string>
+    <string name="theme">Theme</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="battery_saver">Battery Saver</string>
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="Arabic">العربية</string>
+    <string name="about_moviesmix">About MoviesMix</string>
+    <string name="open_source_licences">Open source licences</string>
+    <string name="invalidate_session">Invalidate Session</string>
+    <string name="invalidate_hint">This will remove all your local movies as favourite movies and offline cached images.</string>
+    <string name="developed_with_love">Developed with ❤ by Mohamed Emad</string>
 </resources>

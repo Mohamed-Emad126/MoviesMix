@@ -87,8 +87,6 @@ class PopularAdapter @Inject constructor() :
                 popularMovieClickListener.onMovieHoldDown(bindingAdapterPosition)
                 true
             }
-
-
         }
 
     }

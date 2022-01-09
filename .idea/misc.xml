@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.240625" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable-v24/ic_logo_24.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/circle.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/error_layout.xml" value="0.23692307692307693" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/grad.xml" value="0.25" />
@@ -12,8 +13,11 @@
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/heart_backgrount.xml" value="0.1453125" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/heart_inactive.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/ic_arrow_back.xml" value="0.240625" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/ic_info.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/ic_launcher_background.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/ic_logo.xml" value="0.240625" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/ic_logout.xml" value="0.240625" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/ic_theme.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/indicator_default.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/indicator_selected.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/drawable/indicator_selector.xml" value="0.240625" />
@@ -30,7 +34,7 @@
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_onboarding.xml" value="0.25" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_popular.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_search.xml" value="0.25" />
-        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_settings.xml" value="0.22447916666666667" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_settings.xml" value="0.25" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_start.xml" value="0.25" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_trending.xml" value="0.22" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/fragment_upcoming.xml" value="0.22447916666666667" />
@@ -43,6 +47,7 @@
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/poster_dialog.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/layout/upcoming_item.xml" value="0.22" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/menu/bottom_bar_menu.xml" value="0.22447916666666667" />
+        <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/menu/dark_theme_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/menu/toolbar_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.240625" />
         <entry key="..\:/Programming/Android/Projects/MoviesMix/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.240625" />
