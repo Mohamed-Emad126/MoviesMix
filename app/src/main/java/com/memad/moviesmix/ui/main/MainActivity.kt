@@ -1,5 +1,7 @@
 package com.memad.moviesmix.ui.main
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Gravity.BOTTOM
@@ -9,24 +11,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.navigation.*
+import androidx.transition.Slide
 import androidx.transition.TransitionManager
-import com.google.android.material.transition.MaterialFade
-import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ActivityMainBinding
 import com.memad.moviesmix.ui.main.search.SearchFragmentDirections
 import com.memad.moviesmix.ui.main.settings.SettingsFragmentDirections
+import com.memad.moviesmix.utils.SharedPreferencesHelper
+import com.memad.moviesmix.utils.toLangIfDiff
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.ArrayList
-import android.view.animation.TranslateAnimation
-import androidx.transition.Slide
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener {
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
+
+    @Inject
+    lateinit var preferencesHelper: SharedPreferencesHelper
     private val fragmentsWithoutNavigation: MutableList<Int> by lazy {
         mutableListOf(
             R.id.searchFragment,
@@ -115,10 +119,22 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private fun slideDown(view: View, visibility: Int) {
         TransitionManager.beginDelayedTransition(
             binding.root,
-            Slide(Gravity.BOTTOM).addTarget(view)
+            Slide(BOTTOM).addTarget(view)
                 .setDuration(resources.getInteger(R.integer.duration_medium).toLong())
         )
         view.visibility = visibility
+    }
+
+    override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
+        super.applyOverrideConfiguration(baseContext.resources.configuration)
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(
+            newBase.toLangIfDiff(
+                preferencesHelper.read("langPref", "sys")!!
+            )
+        )
     }
 
 }
