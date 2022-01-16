@@ -2,20 +2,18 @@ package com.memad.moviesmix
 
 import android.app.Application
 import android.content.Context
-import com.memad.moviesmix.utils.SharedPreferencesHelper
-import com.memad.moviesmix.utils.toLangIfDiff
+import com.memad.moviesmix.utils.LocaleUtil
+import com.memad.moviesmix.utils.Storage
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
 
 @HiltAndroidApp
 class App : Application() {
-    @Inject
-    lateinit var preferencesHelper: SharedPreferencesHelper
+
+    val storage : Storage by lazy {
+        Storage(this)
+    }
+
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(
-            base.toLangIfDiff(
-                preferencesHelper.read("langPref", "sys")!!
-            )
-        )
+        super.attachBaseContext(LocaleUtil.getLocalizedContext(base, Storage(base).getPreferredLocale()))
     }
 }

@@ -7,9 +7,14 @@ import android.view.Gravity
 import android.view.Gravity.BOTTOM
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.*
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
@@ -18,14 +23,22 @@ import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ActivityMainBinding
 import com.memad.moviesmix.ui.main.search.SearchFragmentDirections
 import com.memad.moviesmix.ui.main.settings.SettingsFragmentDirections
-import com.memad.moviesmix.utils.SharedPreferencesHelper
-import com.memad.moviesmix.utils.toLangIfDiff
+import com.memad.moviesmix.ui.main.settings.SettingsViewModel
+import com.memad.moviesmix.utils.*
+import com.memad.moviesmix.utils.Constants.BATTERY_SAVER
+import com.memad.moviesmix.utils.Constants.DARK
+import com.memad.moviesmix.utils.Constants.LANG_PREF
+import com.memad.moviesmix.utils.Constants.LIGHT
+import com.memad.moviesmix.utils.Constants.SYSTEM_DEFAULT
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener {
+    private lateinit var oldPrefLocaleCode: String
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
 
@@ -37,6 +50,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             R.id.settingsFragment
         )
     }
+    private val settingsViewModel by viewModels<SettingsViewModel>()
     private val currentNavigationFragment: Fragment?
         get() = supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment)
             ?.childFragmentManager
@@ -46,9 +60,24 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_MoviesMix)
+        applyCurrentTheme()
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsViewModel.themeState.collect {
+                    changeTheme(
+                        when (it) {
+                            ThemeState.BatterySaver -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+                            ThemeState.Dark -> AppCompatDelegate.MODE_NIGHT_YES
+                            ThemeState.Light -> AppCompatDelegate.MODE_NIGHT_NO
+                            ThemeState.SystemDefault -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                        }
+                    )
+                }
+            }
+        }
 
         navController = Navigation.findNavController(this, R.id.main_nav_host_fragment)
         //checkIsFirstMovieRated()
@@ -73,6 +102,33 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             true
         }
     }
+
+    private fun changeTheme(theme: Int) {
+        delegate.localNightMode = theme
+    }
+
+    private fun applyCurrentTheme() {
+        changeTheme(
+            when (preferencesHelper.darkMode) {
+                BATTERY_SAVER -> {
+                    AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+                }
+                SYSTEM_DEFAULT -> {
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                }
+                DARK -> {
+                    AppCompatDelegate.MODE_NIGHT_YES
+                }
+                LIGHT -> {
+                    AppCompatDelegate.MODE_NIGHT_NO
+                }
+                else -> {
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                }
+            }
+        )
+    }
+
 
     private fun navigateTo(axis: Int, directions: NavDirections) {
         slideUp(binding.mainAppbar, View.GONE)
@@ -125,16 +181,19 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         view.visibility = visibility
     }
 
-    override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
-        super.applyOverrideConfiguration(baseContext.resources.configuration)
+    override fun attachBaseContext(newBase: Context) {
+        oldPrefLocaleCode = Storage(newBase).getPreferredLocale()
+        applyOverrideConfiguration(LocaleUtil.getLocalizedConfiguration(oldPrefLocaleCode))
+        super.attachBaseContext(newBase)
     }
 
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(
-            newBase.toLangIfDiff(
-                preferencesHelper.read("langPref", "sys")!!
-            )
-        )
+    override fun onResume() {
+        val currentLocaleCode = Storage(this).getPreferredLocale()
+        if(oldPrefLocaleCode != currentLocaleCode){
+            recreate()
+            oldPrefLocaleCode = currentLocaleCode
+        }
+        super.onResume()
     }
 
 }

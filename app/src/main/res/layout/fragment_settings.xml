@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".ui.main.settings.SettingsFragment">
 
     <androidx.appcompat.widget.Toolbar
@@ -67,10 +66,10 @@
                         app:drawableStartCompat="@drawable/ic_theme" />
 
                     <RadioGroup
+                        android:id="@+id/theme_radio_group"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="4dp"
-                        android:checkedButton="@id/light_radio_button"
                         android:tag="@string/settings"
                         android:visibility="gone">
 
@@ -93,6 +92,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/battery_saver"
+                            app:useMaterialThemeColors="true" />
+
+                        <com.google.android.material.radiobutton.MaterialRadioButton
+                            android:id="@+id/follow_system_radio_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/follow_system"
                             app:useMaterialThemeColors="true" />
                     </RadioGroup>
                 </LinearLayout>
@@ -193,6 +199,7 @@
                 android:layout_margin="8dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/about_app">

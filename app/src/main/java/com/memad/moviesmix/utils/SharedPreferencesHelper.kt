@@ -1,9 +1,8 @@
 package com.memad.moviesmix.utils
 
-import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.memad.moviesmix.utils.Constants.SYSTEM_DEFAULT
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,7 +13,7 @@ class SharedPreferencesHelper @Inject constructor(
 ) {
 
     var darkMode
-        get() = sharedPref.getInt("DARK_STATUS", 0)
+        get() = sharedPref.getInt("DARK_STATUS", SYSTEM_DEFAULT)
         set(value) = sharedPref.edit().putInt("DARK_STATUS", value).apply()
 
 
