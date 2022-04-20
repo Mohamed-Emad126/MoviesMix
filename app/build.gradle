@@ -63,7 +63,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
     //room
-    def roomVersion = "2.4.1"
+    def roomVersion = "2.4.2"
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
@@ -77,17 +77,17 @@ dependencies {
     implementation "com.github.skydoves:sandwich:1.2.2"
 
     //ViewModel-ktx
-    def lifecycle_version = "2.4.0"
+    def lifecycle_version = "2.4.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
     //KTX
-    implementation "androidx.fragment:fragment-ktx:1.4.0"
+    implementation "androidx.fragment:fragment-ktx:1.4.1"
     implementation "androidx.activity:activity-ktx:1.4.0"
 
     //Navigation Component
-    def nav_version = "2.4.0-rc01"
+    def nav_version = "2.5.0-alpha04"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
