@@ -6,10 +6,11 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'androidx.navigation.safeargs.kotlin'
 }
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 32
+    buildToolsVersion "32.0.0"
 
     defaultConfig {
         applicationId "com.memad.moviesmix"
@@ -48,9 +49,9 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
@@ -60,11 +61,11 @@ dependencies {
 
 
     //coroutines
-    def coroutines_version = "1.5.2"
+    def coroutines_version = '1.6.4'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
     //room
-    def roomVersion = "2.4.2"
+    def roomVersion = "2.4.3"
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
@@ -78,17 +79,17 @@ dependencies {
     implementation "com.github.skydoves:sandwich:1.2.2"
 
     //ViewModel-ktx
-    def lifecycle_version = "2.4.1"
+    def lifecycle_version = "2.6.0-alpha01"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
     //KTX
-    implementation "androidx.fragment:fragment-ktx:1.4.1"
-    implementation "androidx.activity:activity-ktx:1.4.0"
+    implementation "androidx.fragment:fragment-ktx:1.5.2"
+    implementation "androidx.activity:activity-ktx:1.5.1"
 
     //Navigation Component
-    def nav_version = "2.5.0-alpha04"
+    def nav_version = "2.5.1"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -103,7 +104,7 @@ dependencies {
     implementation("io.coil-kt:coil:1.4.0")
 
     //lottie
-    def lottieVersion = "4.2.2"
+    def lottieVersion = '5.2.0'
     implementation "com.airbnb.android:lottie:$lottieVersion"
     //VeilLayout
     implementation "com.github.skydoves:androidveil:1.1.2"
@@ -119,4 +120,6 @@ dependencies {
     implementation 'com.liaoinstan.springview:library:1.7.0'
     //Security-Crypto
     implementation 'androidx.security:security-crypto:1.1.0-alpha01'
+    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

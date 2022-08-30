@@ -20,7 +20,6 @@ import com.memad.moviesmix.databinding.FragmentPopularBinding
 import com.memad.moviesmix.databinding.PosterDialogBinding
 import com.memad.moviesmix.utils.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
@@ -77,16 +76,16 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
     }
 
     private fun setupObservables() {
-        networkStatusHelper.observe(viewLifecycleOwner, {
+        networkStatusHelper.observe(viewLifecycleOwner) {
             this.error = when (it) {
-                is NetworkStatus.Available -> context!!.resources.getString(
+                is NetworkStatus.Available -> requireContext().resources.getString(
                     R.string.something_went_wrong
                 )
-                is NetworkStatus.Unavailable -> context!!.resources.getString(
+                is NetworkStatus.Unavailable -> requireContext().resources.getString(
                     R.string.no_network
                 )
             }
-        })
+        }
         lifecycleScope.launchWhenStarted {
             popularViewModel.isFirstLoading.collect {
                 if(it){
