@@ -5,7 +5,7 @@ import com.memad.moviesmix.BuildConfig
 import com.memad.moviesmix.data.remote.MoviesClient
 import com.memad.moviesmix.data.remote.StartClient
 import com.memad.moviesmix.utils.Constants
-import com.skydoves.sandwich.coroutines.CoroutinesResponseCallAdapterFactory
+import com.skydoves.sandwich.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +29,7 @@ class ApiModule {
             baseUrl(Constants.BASE_URL)
             client(client.build())
             addConverterFactory(GsonConverterFactory.create())
-            addCallAdapterFactory(CoroutinesResponseCallAdapterFactory.create())
+            addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
         }.build()
     }
 

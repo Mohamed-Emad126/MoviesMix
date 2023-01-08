@@ -50,7 +50,7 @@ class MainRepoImpl @Inject constructor(
         }.suspendOnError {
             emit(Resource.Error(message(), cachedMovies))
         }.suspendOnFailure {
-            emit(Resource.Error(this, cachedMovies))
+            emit(Resource.Error(message(), cachedMovies))
         }
     }.flowOn(Dispatchers.IO)
 

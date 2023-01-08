@@ -1,9 +1,6 @@
 package com.memad.moviesmix.utils
 
-import javax.inject.Inject
-import javax.inject.Singleton
-
-object AccessNative{
+object AccessNative {
     init {
         System.loadLibrary("api-keys")
     }

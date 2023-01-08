@@ -30,7 +30,8 @@ class LocaleUtil  {
             val localeCode = if(prefCode != OPTION_PHONE_LANGUAGE) {
                 prefCode
             } else {
-                val systemLang = ConfigurationCompat.getLocales(Resources.getSystem().configuration).get(0).language
+                val systemLang =
+                    ConfigurationCompat.getLocales(Resources.getSystem().configuration).get(0)?.language
                 if(systemLang in supportedLocales){
                     systemLang
                 } else {

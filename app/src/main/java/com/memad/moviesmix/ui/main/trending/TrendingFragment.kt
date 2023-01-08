@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import coil.transform.BlurTransformation
 import com.google.android.material.transition.MaterialFadeThrough
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
@@ -28,15 +27,14 @@ import com.memad.moviesmix.databinding.FragmentTrendingBinding
 import com.memad.moviesmix.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class TrendingFragment : Fragment(),
-    TrendingAdapter.OnMoviesClickListener, LoadingAdapter.OnLoadingAdapterClickListener {
+class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
+    LoadingAdapter.OnLoadingAdapterClickListener {
 
     private lateinit var snapHelper: LinearSnapHelper
     private lateinit var concatAdapter: ConcatAdapter
@@ -67,8 +65,7 @@ class TrendingFragment : Fragment(),
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTrendingBinding.inflate(inflater, container, false)
         setupDiscreteScrollView()
@@ -100,15 +97,13 @@ class TrendingFragment : Fragment(),
                         snapHelper.getSnapPosition(recyclerView)
                     )
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView
-                        .apply {
+                    (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView.apply {
                             animate().setDuration(300).scaleX(1F).scaleY(1F)
                                 .setInterpolator(AccelerateInterpolator()).start()
                         }
                     snapPositionChange(snapHelper.getSnapPosition(recyclerView))
                 } else {
-                    (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView
-                        .apply {
+                    (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView.apply {
                             animate().setDuration(300).scaleX(.75F).scaleY(.75F)
                                 .setInterpolator(AccelerateInterpolator()).start()
                         }
@@ -120,16 +115,16 @@ class TrendingFragment : Fragment(),
 
 
     private fun setupObservables() {
-        networkStatusHelper.observe(viewLifecycleOwner, {
+        networkStatusHelper.observe(viewLifecycleOwner) {
             this.error = when (it) {
-                is NetworkStatus.Available -> context!!.resources.getString(
+                is NetworkStatus.Available -> requireContext().resources.getString(
                     R.string.something_went_wrong
                 )
-                is NetworkStatus.Unavailable -> context!!.resources.getString(
+                is NetworkStatus.Unavailable -> requireContext().resources.getString(
                     R.string.no_network
                 )
             }
-        })
+        }
         lifecycleScope.launchWhenStarted {
             trendingViewModel.moviesResource.collect {
                 Log.d(TAG, "setupObservables: $it")
@@ -156,7 +151,7 @@ class TrendingFragment : Fragment(),
     }
 
     private fun error(list: List<MovieEntity>) {
-        if (list.isNullOrEmpty()) {
+        if (list.isEmpty()) {
             loadingAdapter.error()
             binding.movieName.text = error
             binding.headerText.visibility = GONE
@@ -194,8 +189,7 @@ class TrendingFragment : Fragment(),
     ) {
         binding.movieName.text = trendingAdapter.trendingMoviesList[position].movie?.original_title
         binding.backdropImage.load(
-            Constants.POSTER_BASE_URL +
-                    trendingAdapter.trendingMoviesList[position].movie?.backdrop_path
+            Constants.POSTER_BASE_URL + trendingAdapter.trendingMoviesList[position].movie?.backdrop_path
         ) {
             transformations(BlurTransformation(requireContext(), 3f, 3f))
             crossfade(true)
@@ -208,13 +202,9 @@ class TrendingFragment : Fragment(),
 
     private fun createProgressAnimation(voteAverage: Double) {
         binding.progressBar
-        val animation: ObjectAnimator =
-            ObjectAnimator.ofInt(
-                binding.progressBar,
-                "progress",
-                binding.progressBar.progress,
-                voteAverage.toInt() * 100
-            )
+        val animation: ObjectAnimator = ObjectAnimator.ofInt(
+            binding.progressBar, "progress", binding.progressBar.progress, voteAverage.toInt() * 100
+        )
         animation.duration = 1000
         animation.setAutoCancel(true)
         animation.interpolator = DecelerateInterpolator()
