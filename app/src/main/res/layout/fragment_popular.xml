@@ -5,6 +5,7 @@
     android:id="@+id/popular_frame_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     tools:context=".ui.main.popular.PopularFragment">
 
     <com.liaoinstan.springview.widget.SpringView

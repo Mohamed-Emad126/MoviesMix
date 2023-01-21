@@ -43,6 +43,7 @@ class LoadingAdapter @Inject constructor() :
             holder.itemBinding.itemLoadingVeilLayout.unVeil()
             holder.itemBinding.posterImage.load(R.drawable.ic_robot_broken) {
                 crossfade(true)
+                allowHardware(false)
             }
         }
     }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MoviesMix</string>
+    <string name="search">بحث</string>
+    <string name="settings">الاعدادات</string>
+    <string name="hello_blank_fragment">اهلا فراجمنت فاضية</string>
+    <string name="get_your_popcorn">احضر الفشار الخاص بك، ولنختر معا فلماً</string>
+    <string name="start">هيا نبدأ</string>
+    <string name="loading">تحميل</string>
+    <string name="next">التالي</string>
+    <string name="start1">إبدأ</string>
+    <string name="skip">تخطي</string>
+    <string name="welcome">اهلا بك في Movies Mix احضر الفشار ولنختر فيلما</string>
+    <string name="trending">الان باستطاعتك ايجاد تريندات الافلام بسهولة</string>
+    <string name="upcoming">ابحث واعرف الافلام القادمة وقيمها</string>
+    <string name="trending_movies">الافلام الرائجة</string>
+    <string name="upcoming_movies">الافلام القادمة</string>
+    <string name="popular">العام</string>
+    <string name="trending_title">الرائج</string>
+    <string name="upcoming_title">القادمة</string>
+    <string name="favourite">المفضلات</string>
+    <string name="refresh">تحديث</string>
+    <string name="something_went_wrong">حدث خطأ ما</string>
+    <string name="no_network">لايوجد اتصال بالانترنت</string>
+    <string name="trending_header">الافلام الرائجة اليوم</string>
+    <string name="trending_movies_today">الافلام الرائجة اليوم</string>
+    <string name="theme">المظهر</string>
+    <string name="light">فاتح</string>
+    <string name="dark">داكن</string>
+    <string name="battery_saver">حفظ البطارية</string>
+    <string name="language">اللغة</string>
+    <string name="english">English</string>
+    <string name="Arabic">العربية</string>
+    <string name="about_moviesmix">عن التطبيق</string>
+    <string name="open_source_licences">"الاكواد مفتوحة المصدررخصة "</string>
+    <string name="invalidate_session">حذف النموذج الحالي</string>
+    <string name="invalidate_hint">هذا سوف يمسح كل الافلام المحفوظة في المفضلات وكل الافلام المحفوظة في الذاكرة للعرض في حالة عدم وجود انترنت</string>
+    <string name="developed_with_love">طٌور بحب ❤ بواسطة محمد عماد</string>
+    <string name="follow_system">اتبع النظام</string>
+    <string name="unavilable">ميزة غير متوفرة</string>
+    <string name="grant">اعطاء الاذن</string>
+    <string name="cancel">الغاء</string>
+    <string name="permission_needed">اذن مطلوب</string>
+    <string name="ok">حسنا</string>
+    <string name="no_thanks">لا، شكرا</string>
+</resources>

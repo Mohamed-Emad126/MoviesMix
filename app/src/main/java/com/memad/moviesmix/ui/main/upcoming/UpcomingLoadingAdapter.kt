@@ -44,6 +44,7 @@ class UpcomingLoadingAdapter @Inject constructor() :
             holder.itemBinding.upcomingLoadingVeilLayout.unVeil()
             holder.itemBinding.movieImage.load(R.drawable.ic_robot_broken) {
                 crossfade(true)
+                allowHardware(false)
             }
         }
     }

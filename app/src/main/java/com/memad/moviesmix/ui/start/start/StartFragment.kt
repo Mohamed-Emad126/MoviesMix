@@ -36,17 +36,16 @@ class StartFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentStartBinding.inflate(inflater, container, false)
-        networkStatusHelper.announceStatus()
         loadingDialog =
             requireActivity().createDialog(LoadingDialogBinding.inflate(inflater).root, false)
 
         binding.startedButton.setOnClickListener {
             startViewModel.createSession()
         }
-        networkStatusHelper.observe(viewLifecycleOwner, {
+        networkStatusHelper.observe(viewLifecycleOwner) {
             networkStatus = it
-        })
-        startViewModel.createSessionStatus.observe(viewLifecycleOwner, { response ->
+        }
+        startViewModel.createSessionStatus.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     sharedPreferencesHelper.save(
@@ -64,13 +63,12 @@ class StartFragment : Fragment() {
                     loadingDialog.show()
                 }
             }
-        })
+        }
         return binding.root
     }
 
     private fun handleErrorState(response: Resource<AuthResponse>) {
         if (networkStatus is NetworkStatus.Unavailable) {
-            networkStatusHelper.validateNetworkConnections
             Toast.makeText(activity, "No network connection!", Toast.LENGTH_SHORT)
                 .show()
         } else {

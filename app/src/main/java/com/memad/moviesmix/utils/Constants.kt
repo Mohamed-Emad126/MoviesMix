@@ -17,8 +17,6 @@ object Constants {
 
     const val DARK = 5
     const val LIGHT = 6
-    const val BATTERY_SAVER = 7
-    const val SYSTEM_DEFAULT = 8
 
 
 }

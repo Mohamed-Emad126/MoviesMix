@@ -51,6 +51,7 @@ class TrendingAdapter @Inject constructor() :
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)
+                allowHardware(false)
             }
         /*when (trendingMoviesList[position].movieType) {
             LOADING_STATUS_ID -> {

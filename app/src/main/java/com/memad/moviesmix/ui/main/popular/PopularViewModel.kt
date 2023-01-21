@@ -9,10 +9,7 @@ import com.memad.moviesmix.di.annotations.PopularRepo
 import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,19 +18,19 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
     ViewModel() {
 
     private val currentPage = MutableLiveData(1)
-    private val _isFirstLoading = MutableSharedFlow<Boolean>()
     val moviesListLiveData = MutableLiveData<MutableList<MovieEntity>>(mutableListOf())
-    val isFirstLoading: SharedFlow<Boolean> = _isFirstLoading
+
+    private val _isFirstLoading = MutableStateFlow(true)
+    val isFirstLoading: StateFlow<Boolean> = _isFirstLoading.asStateFlow()
+
     private val _moviesResource =
-        MutableSharedFlow<Resource<out List<MovieEntity>>>()
-    val moviesResource: SharedFlow<Resource<out List<MovieEntity>>> = _moviesResource
+        MutableStateFlow<Resource<out List<MovieEntity>>>(Resource.Loading())
+    val moviesResource: StateFlow<Resource<out List<MovieEntity>>> = _moviesResource.asStateFlow()
+
     private val _moviesList = MutableSharedFlow<MutableList<MovieEntity>>()
     val moviesList = _moviesList.asSharedFlow()
 
     init {
-        viewModelScope.launch {
-            _isFirstLoading.emit(true)
-        }
         getMovies(currentPage.value!!)
     }
 
@@ -46,6 +43,7 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
                     moviesListLiveData.value?.clear()
                     moviesListLiveData.value = moviesListLiveData.value
                 }
+                //_isFirstLoading.value = false
                 _isFirstLoading.emit(false)
                 Log.i("TAG: pop VIM:", "before_moviesList :-> ${moviesListLiveData.value?.size}")
                 if (!it.data.isNullOrEmpty()) {
@@ -54,7 +52,7 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
                     _moviesList.emit(moviesListLiveData.value!!)
                     Log.i("TAG: pop VIM:", "after_moviesList :-> ${moviesListLiveData.value?.size}")
                 }
-                _moviesResource.emit(it)
+                _moviesResource.value = it
             }
         }
     }

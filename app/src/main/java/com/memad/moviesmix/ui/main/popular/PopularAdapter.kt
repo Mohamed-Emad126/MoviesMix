@@ -17,7 +17,7 @@ class PopularAdapter @Inject constructor() :
     lateinit var popularMovieClickListener: OnMoviesClickListener
     var popularMoviesList: MutableList<MovieEntity> = mutableListOf()
         set(value) {
-            if (field.isNullOrEmpty()) {
+            if (field.isEmpty()) {
                 field = value
             } else {
                 val lastFinish = field.size
@@ -49,6 +49,7 @@ class PopularAdapter @Inject constructor() :
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)
+                allowHardware(false)
             }
         holder.itemBinding.movieRate.text =
             popularMoviesList[position].movie?.vote_average.toString()

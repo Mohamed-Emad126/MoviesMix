@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.util.Log
 import androidx.lifecycle.LiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -25,62 +26,38 @@ sealed class NetworkStatus {
 class NetworkStatusHelper @Inject constructor(@ApplicationContext context: Context) :
     LiveData<NetworkStatus>() {
 
-    val validateNetworkConnections: ArrayList<Network> = ArrayList()
-    var connectivityManager: ConnectivityManager =
+    private var connectivityManager: ConnectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private lateinit var connectivityManagerCallback: ConnectivityManager.NetworkCallback
 
-    fun announceStatus() {
-        if (validateNetworkConnections.isNotEmpty()) {
-            postValue(NetworkStatus.Available)
-        } else {
-            postValue(NetworkStatus.Unavailable)
-        }
-    }
 
     private fun getConnectivityManagerCallback() =
         object : ConnectivityManager.NetworkCallback() {
+
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                val networkCapability = connectivityManager.getNetworkCapabilities(network)
-                val hasNetworkConnection =
-                    networkCapability?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                        ?: false
-                if (hasNetworkConnection) {
-                    determineInternetAccess(network)
-                }
+                postValue(NetworkStatus.Available)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                validateNetworkConnections.remove(network)
-                announceStatus()
+                postValue(NetworkStatus.Unavailable)
             }
 
             override fun onCapabilitiesChanged(
                 network: Network,
                 networkCapabilities: NetworkCapabilities
             ) {
-                super.onCapabilitiesChanged(network, networkCapabilities)
-                if (networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    determineInternetAccess(network)
-                } else {
-                    validateNetworkConnections.remove(network)
-                }
-                announceStatus()
+                val isInternet =
+                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                val isValidated =
+                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                postValue(
+                    if (isInternet && isValidated) NetworkStatus.Available else NetworkStatus.Unavailable
+                )
             }
-        }
 
-    private fun determineInternetAccess(network: Network) {
-        CoroutineScope(Dispatchers.IO).launch {
-            if (InternetAvailability.check()) {
-                withContext(Dispatchers.Main) {
-                    validateNetworkConnections.add(network)
-                    announceStatus()
-                }
-            }
         }
-    }
 
 
     override fun onActive() {
@@ -100,18 +77,3 @@ class NetworkStatusHelper @Inject constructor(@ApplicationContext context: Conte
 
 }
 
-object InternetAvailability {
-
-    fun check(): Boolean {
-        return try {
-            val socket = Socket()
-            socket.connect(InetSocketAddress("8.8.8.8", 53))
-            socket.close()
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
-}

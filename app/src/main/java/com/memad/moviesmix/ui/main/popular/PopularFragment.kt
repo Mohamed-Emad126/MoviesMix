@@ -21,6 +21,7 @@ import com.memad.moviesmix.databinding.PosterDialogBinding
 import com.memad.moviesmix.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -53,7 +54,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPopularBinding.inflate(inflater, container, false)
-        networkStatusHelper.announceStatus()
         setupObservables()
         initRecyclerView()
         _posterDialogBinding = PosterDialogBinding.inflate(inflater)
@@ -86,30 +86,50 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
                 )
             }
         }
-        lifecycleScope.launchWhenStarted {
-            popularViewModel.isFirstLoading.collect {
-                if(it){
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            popularViewModel.isFirstLoading.collectLatest {
+                Log.i(
+                    "TAG: popp:",
+                    "isFirstLoading $it"
+                )
+                if (it) {
                     firstLoadingHandle()
                 }
             }
+
         }
-        lifecycleScope.launchWhenStarted {
-            popularViewModel.moviesResource.collect {
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            popularViewModel.moviesResource.collectLatest {
+                Log.i(
+                    "TAG: popp:",
+                    "moviesResource ${it.toString()}"
+                )
                 when (it) {
                     is Resource.Loading -> {
+                        if (popularViewModel.isFirstLoading.value) {
+                            firstLoadingHandle()
+                        } else {
                             loading()
+                        }
                     }
                     is Resource.Error -> error(popularViewModel.moviesListLiveData.value)
                     is Resource.Success -> success()
                 }
             }
         }
-        lifecycleScope.launchWhenStarted {
+        viewLifecycleOwner.lifecycleScope.launch {
             popularViewModel.moviesList.collectLatest {
-                //TODO: FIX this and observe on moviesListLiveData
-                Log.i("TAG: pop fragB:", "${it.size} :-> ${popularAdapter.popularMoviesList.size}")
+                Log.i(
+                    "TAG: popp:",
+                    "${it.size} :-> ${popularAdapter.popularMoviesList.size}"
+                )
                 popularAdapter.popularMoviesList = it
-                Log.i("TAG: pop fragA:", "${it.size} :-> ${popularAdapter.popularMoviesList.size}")
+                Log.i(
+                    "TAG: popp:",
+                    "${it.size} :-> ${popularAdapter.popularMoviesList.size}"
+                )
             }
         }
     }
@@ -121,7 +141,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         binding.loadingLayout.loadingLayout.visibility = View.GONE
     }
 
-    private fun firstLoadingHandle(){
+    private fun firstLoadingHandle() {
         binding.loadingLayout.loadingLayout.visibility = View.VISIBLE
         binding.springView.visibility = View.GONE
         binding.errorLayout.errorLayout.visibility = View.GONE
@@ -129,14 +149,14 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
 
     private fun success() {
+        binding.springView.onFinishFreshAndLoad()
         binding.springView.visibility = View.VISIBLE
         binding.loadingLayout.loadingLayout.visibility = View.GONE
-        binding.springView.onFinishFreshAndLoad()
         binding.errorLayout.errorLayout.visibility = View.GONE
+        binding.springView.visibility = View.VISIBLE
     }
 
     private fun error(data: List<MovieEntity>?) {
-        networkStatusHelper.announceStatus()
         if (data.isNullOrEmpty()) {
             binding.springView.visibility = View.GONE
             binding.errorLayout.errorLayout.visibility = View.VISIBLE
@@ -175,11 +195,14 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
     override fun onMovieHoldDown(position: Int) {
         posterDialogBinding.posterDialogImage
-            .load(Constants.POSTER_BASE_URL +
-                    popularAdapter.popularMoviesList[position].movie?.poster_path){
+            .load(
+                Constants.POSTER_BASE_URL +
+                        popularAdapter.popularMoviesList[position].movie?.poster_path
+            ) {
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)
+                allowHardware(false)
             }
         posterDialog.show()
     }

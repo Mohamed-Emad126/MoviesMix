@@ -1,29 +1,44 @@
 package com.memad.moviesmix.ui.main.settings
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat.getDrawable
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.transition.TransitionManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.FragmentSettingsBinding
-import com.memad.moviesmix.utils.ThemeState
+import com.memad.moviesmix.models.AuthResponse
+import com.memad.moviesmix.ui.main.MainActivity
+import com.memad.moviesmix.ui.start.StartActivity
+import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.Constants.DARK
+import com.memad.moviesmix.utils.Constants.LANG_PREF
+import com.memad.moviesmix.utils.Constants.LIGHT
+import com.memad.moviesmix.utils.SharedPreferencesHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
+    @Inject
+    lateinit var gson: Gson
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
-    private val settingsViewModel by activityViewModels<SettingsViewModel>()
+    private val locales = arrayOf("العربية", "English")
+
+    @Inject
+    lateinit var preferencesHelper: SharedPreferencesHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,66 +52,75 @@ class SettingsFragment : Fragment() {
                 expandCard()
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.themeState.collect {
-                    setThemeChoice(it)
-                }
-            }
+        binding.settingsToolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
         }
+
+        val currentLang = preferencesHelper.read(LANG_PREF, "1")?.toInt()!!
+
+        binding.languageTextView.text = locales[currentLang]
+        if (currentLang == 0) {
+            binding.settingsToolbar.navigationIcon =
+                getDrawable(requireContext(), R.drawable.ic_arrow_back)
+        }
+        setThemeChoice(preferencesHelper.darkMode)
         binding.themeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 binding.lightRadioButton.id -> {
-                    settingsViewModel.changeTheme(ThemeState.Light)
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    preferencesHelper.darkMode = LIGHT
                 }
                 binding.darkRadioButton.id -> {
-                    settingsViewModel.changeTheme(ThemeState.Dark)
-                }
-                binding.batterySaverRadioButton.id -> {
-                    settingsViewModel.changeTheme(ThemeState.BatterySaver)
-                }
-                binding.followSystemRadioButton.id -> {
-                    settingsViewModel.changeTheme(ThemeState.SystemDefault)
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    preferencesHelper.darkMode = DARK
                 }
             }
+            requireActivity().recreate()
         }
 
+        binding.languageCardView.setOnClickListener {
+            openLanguageSelectorDialog(currentLang)
+        }
+        binding.removeCache.setOnClickListener {
+            preferencesHelper.save(
+                Constants.SESSION,
+                AuthResponse("", "", false)
+            )
+            requireActivity().finish()
+            startActivity(Intent(context, StartActivity::class.java))
+        }
         return binding.root
     }
 
-    private fun setThemeChoice(it: ThemeState) {
+
+    private fun setThemeChoice(it: Int) {
         when (it) {
-            ThemeState.Light -> {
-                binding.themeRadioGroup.check(binding.lightRadioButton.id)
+            LIGHT -> {
+                binding.lightRadioButton.isChecked = true
             }
-            ThemeState.Dark -> {
-                binding.themeRadioGroup.check(binding.darkRadioButton.id)
-            }
-            ThemeState.BatterySaver -> {
-                binding.themeRadioGroup.check(binding.batterySaverRadioButton.id)
-            }
-            ThemeState.SystemDefault -> {
-                binding.themeRadioGroup.check(binding.followSystemRadioButton.id)
+            DARK -> {
+                binding.darkRadioButton.isChecked = true
+
             }
         }
     }
 
     private fun collapseCard() {
-        TransitionManager.beginDelayedTransition(binding.themeCardView)
-        binding.themeRadioGroup.visibility = View.GONE
-        binding.themeTextView.setCompoundDrawables(
-            AppCompatResources.getDrawable(context!!, R.drawable.ic_theme), null,
-            AppCompatResources.getDrawable(context!!, R.drawable.ic_arrow_down), null
+        TransitionManager.beginDelayedTransition(binding.root)
+        binding.themeTextView.setCompoundDrawablesWithIntrinsicBounds(
+            getDrawable(requireContext(), R.drawable.ic_theme), null,
+            getDrawable(requireContext(), R.drawable.ic_arrow_down), null
         )
+        binding.themeRadioGroup.visibility = View.GONE
     }
 
     private fun expandCard() {
-        TransitionManager.beginDelayedTransition(binding.themeCardView)
-        binding.themeRadioGroup.visibility = View.VISIBLE
-        binding.themeTextView.setCompoundDrawables(
-            AppCompatResources.getDrawable(context!!, R.drawable.ic_theme), null,
-            AppCompatResources.getDrawable(context!!, R.drawable.ic_arrow_up), null
+        TransitionManager.beginDelayedTransition(binding.root)
+        binding.themeTextView.setCompoundDrawablesWithIntrinsicBounds(
+            getDrawable(requireContext(), R.drawable.ic_theme), null,
+            getDrawable(requireContext(), R.drawable.ic_arrow_up), null
         )
+        binding.themeRadioGroup.visibility = View.VISIBLE
     }
 
 
@@ -105,4 +129,29 @@ class SettingsFragment : Fragment() {
         _binding = null
     }
 
+    private fun openLanguageSelectorDialog(currentLang: Int) {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(getString(R.string.language))
+
+
+        builder.setSingleChoiceItems(locales, currentLang) { _, which ->
+            when (which) {
+                0 -> {
+                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("ar")
+                    AppCompatDelegate.setApplicationLocales(appLocale)
+                    preferencesHelper.save(LANG_PREF, 0)
+                    requireActivity().recreate()
+                }
+                1 -> {
+                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                    AppCompatDelegate.setApplicationLocales(appLocale)
+                    preferencesHelper.save(LANG_PREF, 1)
+                    requireActivity().recreate()
+                }
+            }
+        }
+        builder.create().apply {
+            show()
+        }
+    }
 }

@@ -1,38 +1,27 @@
 package com.memad.moviesmix.ui.main
 
+import android.animation.Animator
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
-import android.view.Gravity
-import android.view.Gravity.BOTTOM
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.*
-import androidx.transition.Slide
-import androidx.transition.TransitionManager
 import com.google.android.material.transition.MaterialSharedAxis
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ActivityMainBinding
 import com.memad.moviesmix.ui.main.search.SearchFragmentDirections
 import com.memad.moviesmix.ui.main.settings.SettingsFragmentDirections
-import com.memad.moviesmix.ui.main.settings.SettingsViewModel
-import com.memad.moviesmix.utils.*
-import com.memad.moviesmix.utils.Constants.BATTERY_SAVER
 import com.memad.moviesmix.utils.Constants.DARK
-import com.memad.moviesmix.utils.Constants.LANG_PREF
 import com.memad.moviesmix.utils.Constants.LIGHT
-import com.memad.moviesmix.utils.Constants.SYSTEM_DEFAULT
+import com.memad.moviesmix.utils.LocaleUtil
+import com.memad.moviesmix.utils.SharedPreferencesHelper
+import com.memad.moviesmix.utils.Storage
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -50,7 +39,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             R.id.settingsFragment
         )
     }
-    private val settingsViewModel by viewModels<SettingsViewModel>()
     private val currentNavigationFragment: Fragment?
         get() = supportFragmentManager.findFragmentById(R.id.main_nav_host_fragment)
             ?.childFragmentManager
@@ -58,26 +46,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             ?.first()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_MoviesMix)
         applyCurrentTheme()
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.themeState.collect {
-                    changeTheme(
-                        when (it) {
-                            ThemeState.BatterySaver -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-                            ThemeState.Dark -> AppCompatDelegate.MODE_NIGHT_YES
-                            ThemeState.Light -> AppCompatDelegate.MODE_NIGHT_NO
-                            ThemeState.SystemDefault -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                        }
-                    )
-                }
-            }
-        }
 
         navController = Navigation.findNavController(this, R.id.main_nav_host_fragment)
         //checkIsFirstMovieRated()
@@ -104,18 +78,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
 
     private fun changeTheme(theme: Int) {
-        delegate.localNightMode = theme
+        AppCompatDelegate.setDefaultNightMode(theme)
+        delegate.applyDayNight()
     }
 
     private fun applyCurrentTheme() {
         changeTheme(
             when (preferencesHelper.darkMode) {
-                BATTERY_SAVER -> {
-                    AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-                }
-                SYSTEM_DEFAULT -> {
-                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                }
                 DARK -> {
                     AppCompatDelegate.MODE_NIGHT_YES
                 }
@@ -123,7 +92,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                     AppCompatDelegate.MODE_NIGHT_NO
                 }
                 else -> {
-                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    AppCompatDelegate.MODE_NIGHT_NO
                 }
             }
         )
@@ -131,8 +100,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
 
     private fun navigateTo(axis: Int, directions: NavDirections) {
-        slideUp(binding.mainAppbar, View.GONE)
-        slideDown(binding.smoothBottomBar, View.GONE)
         currentNavigationFragment?.apply {
             exitTransition = MaterialSharedAxis(axis, true).apply {
                 duration = resources.getInteger(R.integer.duration_large).toLong()
@@ -157,28 +124,98 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         arguments: Bundle?
     ) {
         if (destination.id !in fragmentsWithoutNavigation) {
-            slideUp(binding.mainAppbar, View.VISIBLE)
-            slideDown(binding.smoothBottomBar, View.VISIBLE)
+            slideDownAppBar()
+            slideUpBottomBarr()
+        } else {
+            slideUpAppBar()
+            slideDownBottomBar()
         }
     }
 
 
-    private fun slideUp(view: View, visibility: Int) {
-        TransitionManager.beginDelayedTransition(
-            binding.root,
-            Slide(Gravity.TOP).addTarget(view)
-                .setDuration(resources.getInteger(R.integer.duration_medium).toLong())
-        )
-        view.visibility = visibility
+    private fun slideUpAppBar(view: View = binding.mainAppbar) {
+        view.animate().apply {
+            translationYBy(0F)
+            translationY(view.height.toFloat() * -1)
+            duration = resources.getInteger(R.integer.duration_large).toLong()
+        }.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {
+                view.visibility = View.GONE
+            }
+
+            override fun onAnimationEnd(p0: Animator) {
+            }
+
+            override fun onAnimationCancel(p0: Animator) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator) {
+            }
+        })
     }
 
-    private fun slideDown(view: View, visibility: Int) {
-        TransitionManager.beginDelayedTransition(
-            binding.root,
-            Slide(BOTTOM).addTarget(view)
-                .setDuration(resources.getInteger(R.integer.duration_medium).toLong())
-        )
-        view.visibility = visibility
+    private fun slideDownBottomBar(view: View = binding.smoothBottomBar) {
+        view.animate().apply {
+            translationYBy(0F)
+            translationY(view.height.toFloat())
+            duration = resources.getInteger(R.integer.duration_large).toLong()
+        }.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {
+                view.visibility = View.GONE
+            }
+
+            override fun onAnimationEnd(p0: Animator) {
+
+            }
+
+            override fun onAnimationCancel(p0: Animator) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator) {
+            }
+        })
+    }
+
+    private fun slideDownAppBar(view: View = binding.mainAppbar) {
+        view.animate().apply {
+            translationYBy(view.height.toFloat())
+            translationY(0F)
+            duration = resources.getInteger(R.integer.duration_large).toLong()
+        }.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {
+                view.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd(p0: Animator) {
+            }
+
+            override fun onAnimationCancel(p0: Animator) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator) {
+            }
+        })
+    }
+
+    private fun slideUpBottomBarr(view: View = binding.smoothBottomBar) {
+        view.animate().apply {
+            translationYBy(view.height.toFloat())
+            translationY(0F)
+            duration = resources.getInteger(R.integer.duration_large).toLong()
+        }.setListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {
+                view.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd(p0: Animator) {
+            }
+
+            override fun onAnimationCancel(p0: Animator) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator) {
+            }
+        })
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -189,7 +226,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     override fun onResume() {
         val currentLocaleCode = Storage(this).getPreferredLocale()
-        if(oldPrefLocaleCode != currentLocaleCode){
+        if (oldPrefLocaleCode != currentLocaleCode) {
             recreate()
             oldPrefLocaleCode = currentLocaleCode
         }

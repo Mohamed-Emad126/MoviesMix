@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.transition.MaterialFadeThrough
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
@@ -158,7 +159,7 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
             binding.movieGenre.visibility = GONE
             binding.sparkButton.visibility = GONE
             binding.releaseYear.visibility = GONE
-            binding.backdropImage.load(R.drawable.start_img_min_blur)
+            binding.backdropImage.load(R.drawable.start_img_min_blur){allowHardware(false)}
             binding.progressPercent.text = ""
             binding.progressBar.progress = 0
         }
@@ -181,7 +182,7 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
         binding.releaseYear.visibility = GONE
         binding.progressPercent.text = ""
         createProgressAnimation(0.0)
-        binding.backdropImage.load(R.drawable.start_img_min_blur)
+        binding.backdropImage.load(R.drawable.start_img_min_blur){allowHardware(false)}
     }
 
     private fun handleDetailsUi(
@@ -191,10 +192,11 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
         binding.backdropImage.load(
             Constants.POSTER_BASE_URL + trendingAdapter.trendingMoviesList[position].movie?.backdrop_path
         ) {
-            transformations(BlurTransformation(requireContext(), 3f, 3f))
+            transformations(BlurTransformation(requireContext(),3f, 3f))
             crossfade(true)
             placeholder(R.drawable.start_img_min_blur)
             error(R.drawable.start_img_min_blur)
+            allowHardware(false)
         }
         createProgressAnimation(trendingAdapter.trendingMoviesList[position].movie?.vote_average!!)
         binding.releaseYear.text = trendingAdapter.trendingMoviesList[position].movie?.release_date
