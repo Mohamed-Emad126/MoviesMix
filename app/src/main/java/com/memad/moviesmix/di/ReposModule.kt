@@ -2,9 +2,8 @@ package com.memad.moviesmix.di
 
 import com.memad.moviesmix.data.local.MoviesDao
 import com.memad.moviesmix.data.remote.MoviesClient
-import com.memad.moviesmix.di.annotations.PopularRepo
-import com.memad.moviesmix.di.annotations.TrendingRepo
-import com.memad.moviesmix.di.annotations.UpcomingRepo
+import com.memad.moviesmix.di.annotations.*
+import com.memad.moviesmix.repos.FavouritesRepoImplementation
 import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.repos.MainRepoImpl
 import com.memad.moviesmix.utils.Constants

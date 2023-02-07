@@ -8,11 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import coil.load
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
+import com.google.gson.Gson
 import com.liaoinstan.springview.widget.SpringView
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
@@ -54,6 +60,8 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPopularBinding.inflate(inflater, container, false)
+        postponeEnterTransition()
+        binding.root.doOnPreDraw { startPostponedEnterTransition() }
         setupObservables()
         initRecyclerView()
         _posterDialogBinding = PosterDialogBinding.inflate(inflater)
@@ -85,14 +93,11 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
                     R.string.no_network
                 )
             }
+            Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             popularViewModel.isFirstLoading.collectLatest {
-                Log.i(
-                    "TAG: popp:",
-                    "isFirstLoading $it"
-                )
                 if (it) {
                     firstLoadingHandle()
                 }
@@ -102,10 +107,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
         viewLifecycleOwner.lifecycleScope.launch {
             popularViewModel.moviesResource.collectLatest {
-                Log.i(
-                    "TAG: popp:",
-                    "moviesResource ${it.toString()}"
-                )
                 when (it) {
                     is Resource.Loading -> {
                         if (popularViewModel.isFirstLoading.value) {
@@ -114,7 +115,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
                             loading()
                         }
                     }
-                    is Resource.Error -> error(popularViewModel.moviesListLiveData.value)
+                    is Resource.Error -> error(popularViewModel.moviesListLiveData.value?.toMutableList())
                     is Resource.Success -> success()
                 }
             }
@@ -123,12 +124,13 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
             popularViewModel.moviesList.collectLatest {
                 Log.i(
                     "TAG: popp:",
-                    "${it.size} :-> ${popularAdapter.popularMoviesList.size}"
+                    "${it.size} :-> ${popularAdapter.currentList.size}"
                 )
-                popularAdapter.popularMoviesList = it
+                //popularAdapter.popularMoviesList = it
+                popularAdapter.submitList(it.toMutableList())
                 Log.i(
                     "TAG: popp:",
-                    "${it.size} :-> ${popularAdapter.popularMoviesList.size}"
+                    "${it.size} :-> ${popularAdapter.currentList.size}"
                 )
             }
         }
@@ -153,7 +155,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         binding.springView.visibility = View.VISIBLE
         binding.loadingLayout.loadingLayout.visibility = View.GONE
         binding.errorLayout.errorLayout.visibility = View.GONE
-        binding.springView.visibility = View.VISIBLE
     }
 
     private fun error(data: List<MovieEntity>?) {
@@ -164,7 +165,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         } else {
             binding.springView.visibility = View.VISIBLE
             binding.errorLayout.errorLayout.visibility = View.GONE
-            Toast.makeText(context, this.error, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, this.error, Toast.LENGTH_SHORT).show()
         }
         binding.loadingLayout.loadingLayout.visibility = View.GONE
         binding.springView.onFinishFreshAndLoad()
@@ -185,8 +186,19 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         _posterDialogBinding = null
     }
 
-    override fun onMovieClicked(position: Int, imageView: ImageView?) {
+    override fun onMovieClicked(position: Int, imageView: ShapeableImageView) {
         Toast.makeText(context, "single", Toast.LENGTH_SHORT).show()
+        val extras = FragmentNavigatorExtras(
+            imageView to popularAdapter.currentList[position].movieId.toString()
+        )
+        findNavController().navigate(
+            PopularFragmentDirections.actionPopularFragmentToMovieDescriptionFragment(
+                Gson().toJson(popularAdapter.currentList[position]),
+                popularAdapter.currentList[position].movieId.toString(),
+                popularAdapter.currentList[position].movie?.poster_path!!
+            ),
+            extras
+        )
     }
 
     override fun onMovieDoubleClicked(position: Int, imageView: ImageView?) {
@@ -197,7 +209,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         posterDialogBinding.posterDialogImage
             .load(
                 Constants.POSTER_BASE_URL +
-                        popularAdapter.popularMoviesList[position].movie?.poster_path
+                        popularAdapter.currentList[position].movie?.poster_path
             ) {
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
@@ -205,5 +217,11 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
                 allowHardware(false)
             }
         posterDialog.show()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 }

@@ -9,7 +9,24 @@
         android:id="@+id/popularFragment"
         android:name="com.memad.moviesmix.ui.main.popular.PopularFragment"
         android:label="fragment_popular"
-        tools:layout="@layout/fragment_popular" />
+        tools:layout="@layout/fragment_popular" >
+        <action
+            android:id="@+id/action_popularFragment_to_movieDescriptionFragment"
+            app:destination="@id/movieDescriptionFragment" >
+            <argument
+                android:name="movie"
+                app:argType="string"
+                />
+            <argument
+                android:name="movieId"
+                app:argType="string"
+                />
+            <argument
+                android:name="moviePoster"
+                app:argType="string"
+                />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/trendingFragment"
         android:name="com.memad.moviesmix.ui.main.trending.TrendingFragment"
@@ -41,4 +58,22 @@
     <action
         android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment" />
+    <fragment
+        android:id="@+id/movieDescriptionFragment"
+        android:name="com.memad.moviesmix.ui.main.description.MovieDescriptionFragment"
+        android:label="fragment_movie_description"
+        tools:layout="@layout/fragment_movie_description">
+        <argument
+            android:name="movie"
+            app:argType="string"
+            />
+        <argument
+            android:name="movieId"
+            app:argType="string"
+            />
+        <argument
+            android:name="moviePoster"
+            app:argType="string"
+            />
+    </fragment>
 </navigation>

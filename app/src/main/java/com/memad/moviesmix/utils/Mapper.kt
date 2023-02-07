@@ -11,9 +11,9 @@ import javax.inject.Singleton
 class SuccessMoviesMapper @Inject constructor(private val movieType: Int) :
     ApiSuccessModelMapper<MoviesResponse, List<MovieEntity>> {
 
-    override fun map(apiErrorResponse: ApiResponse.Success<MoviesResponse>): List<MovieEntity> {
-        return apiErrorResponse.data.results.map {
-            MovieEntity(movieType, apiErrorResponse.data.page,it)
+    override fun map(apiSuccessResponse: ApiResponse.Success<MoviesResponse>): List<MovieEntity> {
+        return apiSuccessResponse.data.results.map {
+            MovieEntity(it.id, movieType, apiSuccessResponse.data.page, it)
         }
     }
 }

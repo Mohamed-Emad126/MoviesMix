@@ -12,16 +12,19 @@ interface MoviesDao {
     suspend fun insertMovies(movies: List<MovieEntity>): Array<Long>
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertFavouriteMovie(movies: MovieEntity): Long
+    suspend fun insertFavouriteMovie(movies: FavouritesEntity): Long
 
     @Query("DELETE FROM MOVIE_TABLE WHERE movie_type = :type AND movie_page =:page")
     suspend fun deleteMovies(type: Int, page: Int): Int
 
-    @Query("DELETE FROM MOVIE_TABLE WHERE movie_type = 3 AND Movie_id = :movieId")
+    @Query("DELETE FROM FAVOURITES_TABLE WHERE Movie_id = :movieId")
     suspend fun deleteFavouriteMovie(movieId: Int): Int
 
-    @Query("SELECT EXISTS(SELECT 1 FROM MOVIE_TABLE WHERE movie_type= 3 AND movie LIKE '%' || '\"id\": ' || :apiMovieId || '%' )")
-    suspend fun checkIsFavourite(apiMovieId: Int): Int
+    @Query("SELECT CASE WHEN EXISTS(SELECT 1 FROM FAVOURITES_TABLE WHERE Movie_id = :apiMovieId ) THEN TRUE ELSE FALSE END")
+    suspend fun checkIsFavourite(apiMovieId: Int): Boolean
+
+    @Query("SELECT * FROM FAVOURITES_TABLE")
+    fun getAllFavouriteMovies(): Flow<List<FavouritesEntity>>
 
     @Query("SELECT * FROM MOVIE_TABLE WHERE movie_type = :type AND movie_page =:page")
     fun getAllMovies(type: Int, page: Int): Flow<List<MovieEntity>>

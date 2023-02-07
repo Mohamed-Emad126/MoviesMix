@@ -36,7 +36,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private val fragmentsWithoutNavigation: MutableList<Int> by lazy {
         mutableListOf(
             R.id.searchFragment,
-            R.id.settingsFragment
+            R.id.settingsFragment,
+            R.id.movieDescriptionFragment
         )
     }
     private val currentNavigationFragment: Fragment?

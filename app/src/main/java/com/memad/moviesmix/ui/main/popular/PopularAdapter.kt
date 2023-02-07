@@ -3,29 +3,30 @@ package com.memad.moviesmix.ui.main.popular
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.imageview.ShapeableImageView
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.MoviePopularItemBinding
+import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.DoubleClickListener
 import javax.inject.Inject
 
 class PopularAdapter @Inject constructor() :
-    RecyclerView.Adapter<PopularAdapter.PopularViewHolder>() {
-    lateinit var popularMovieClickListener: OnMoviesClickListener
-    var popularMoviesList: MutableList<MovieEntity> = mutableListOf()
-        set(value) {
-            if (field.isEmpty()) {
-                field = value
-            } else {
-                val lastFinish = field.size
-                field = value
-                notifyItemRangeInserted(lastFinish, 20)
-            }
-        }
+    ListAdapter<MovieEntity, PopularAdapter.PopularViewHolder>(MoviesDiffCallBack) {
 
+    lateinit var popularMovieClickListener: OnMoviesClickListener
+
+    override fun submitList(list: MutableList<MovieEntity>?) {
+        val oldSize = list?.size ?: 0
+        super.submitList(list)
+        notifyItemRangeInserted(oldSize, 20)
+    }
 
     /////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
@@ -41,10 +42,11 @@ class PopularAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
+        holder.itemBinding.posterImage.transitionName = getItem(position).movieId.toString()
         holder.itemBinding.posterImage
             .load(
                 Constants.POSTER_BASE_URL +
-                        popularMoviesList[position].movie?.poster_path
+                        getItem(position).movie?.poster_path
             ) {
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
@@ -52,15 +54,15 @@ class PopularAdapter @Inject constructor() :
                 allowHardware(false)
             }
         holder.itemBinding.movieRate.text =
-            popularMoviesList[position].movie?.vote_average.toString()
+            getItem(position).movie?.vote_average.toString()
     }
 
     override fun getItemCount(): Int {
-        return popularMoviesList.size
+        return currentList.size
     }
 
     override fun getItemId(position: Int): Long {
-        return popularMoviesList[position].movieId?.toLong()!!
+        return getItem(position).movieId?.toLong()!!
     }
 
     /////////////////////////////////////////////////////////////////
@@ -96,8 +98,18 @@ class PopularAdapter @Inject constructor() :
     ///////////////////ClickListenerInterface////////////////////////
     /////////////////////////////////////////////////////////////////
     interface OnMoviesClickListener {
-        fun onMovieClicked(position: Int, imageView: ImageView?)
+        fun onMovieClicked(position: Int, imageView: ShapeableImageView)
         fun onMovieDoubleClicked(position: Int, imageView: ImageView?)
         fun onMovieHoldDown(position: Int)
+    }
+}
+
+object MoviesDiffCallBack : DiffUtil.ItemCallback<MovieEntity>() {
+    override fun areItemsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
+        return newItem.movie == oldItem.movie
+    }
+
+    override fun areContentsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
+        return newItem.movie?.id == oldItem.movie?.id
     }
 }

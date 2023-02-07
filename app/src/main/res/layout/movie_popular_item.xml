@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/movie_card"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical|center_horizontal"
-    android:id="@+id/movie_card"
-    app:cardUseCompatPadding="true"
-    app:cardPreventCornerOverlap="false"
+    app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
-    app:cardCornerRadius="8dp">
+    android:animateLayoutChanges="true"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/poster_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
@@ -23,19 +23,21 @@
 
     <FrameLayout
         android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:background="@drawable/heart_background"
+        android:layout_height="70dp"
         android:layout_gravity="top|end"
-        >
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/heart_background">
+
         <TextView
             android:id="@+id/movie_rate"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center|end"
             android:padding="16dp"
             android:text="7.7"
-            android:gravity="center|end"
             android:textColor="@color/goldEndColor"
             android:textSize="14sp"
             app:drawableStartCompat="@drawable/star" />
+
     </FrameLayout>
 </com.google.android.material.card.MaterialCardView>

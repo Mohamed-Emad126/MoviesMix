@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    tools:context=".ui.main.description.MovieDescriptionFragment">
+
+    <ImageView
+        android:id="@+id/movie_cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/start_img_min_blur"/>
+
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.varunest.sparkbutton.SparkButton
+        android:id="@+id/favourite_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:sparkbutton_activeImage="@drawable/heart_active"
+        app:sparkbutton_iconSize="24dp"
+        app:sparkbutton_inActiveImage="@drawable/heart_inactive"
+        app:sparkbutton_primaryColor="@color/spark_primary_color"
+        app:sparkbutton_secondaryColor="@color/secondaryColor" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/bottom_sheet_parent"
+            style="?attr/bottomSheetStyle"
+            layout="@layout/bottom_sheet_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:behavior_hideable="true"
+            app:behavior_peekHeight="300dp"
+            app:layout_anchorGravity="bottom"
+            app:layout_behavior="@string/bottom_sheet_behavior" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

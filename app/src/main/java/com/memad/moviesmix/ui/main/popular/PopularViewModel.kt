@@ -12,13 +12,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @HiltViewModel
 class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl: MainRepo) :
     ViewModel() {
 
     private val currentPage = MutableLiveData(1)
-    val moviesListLiveData = MutableLiveData<MutableList<MovieEntity>>(mutableListOf())
+    val moviesListLiveData = MutableLiveData<MutableSet<MovieEntity>>(mutableSetOf())
 
     private val _isFirstLoading = MutableStateFlow(true)
     val isFirstLoading: StateFlow<Boolean> = _isFirstLoading.asStateFlow()
@@ -27,7 +28,7 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
         MutableStateFlow<Resource<out List<MovieEntity>>>(Resource.Loading())
     val moviesResource: StateFlow<Resource<out List<MovieEntity>>> = _moviesResource.asStateFlow()
 
-    private val _moviesList = MutableSharedFlow<MutableList<MovieEntity>>()
+    private val _moviesList = MutableSharedFlow<MutableSet<MovieEntity>>()
     val moviesList = _moviesList.asSharedFlow()
 
     init {
@@ -39,18 +40,16 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
             mainRepoImpl.getAllMovies(
                 page
             ).collect {
-                if (currentPage.value == 1) {
+                if (page == 1) {
                     moviesListLiveData.value?.clear()
-                    moviesListLiveData.value = moviesListLiveData.value
                 }
-                //_isFirstLoading.value = false
                 _isFirstLoading.emit(false)
-                Log.i("TAG: pop VIM:", "before_moviesList :-> ${moviesListLiveData.value?.size}")
+                //Log.i("TAG: pop VIM:", "before_moviesList :-> ${moviesListLiveData.value?.size}")
                 if (!it.data.isNullOrEmpty()) {
-                    Log.i("TAG: pop VIM:", "isNullOrEmpty :-> ${it.data.size}")
+                    //Log.i("TAG: pop VIM:", "isNullOrEmpty :-> ${it.data.size}")
                     moviesListLiveData.value?.addAll(it.data)
-                    _moviesList.emit(moviesListLiveData.value!!)
-                    Log.i("TAG: pop VIM:", "after_moviesList :-> ${moviesListLiveData.value?.size}")
+                    _moviesList.emit(moviesListLiveData.value?.toMutableSet()!!)
+                    //Log.i("TAG: pop VIM:", "after_moviesList :-> ${moviesListLiveData.value?.size}")
                 }
                 _moviesResource.value = it
             }

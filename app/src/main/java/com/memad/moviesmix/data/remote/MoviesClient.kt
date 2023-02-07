@@ -24,10 +24,9 @@ interface MoviesClient {
         @Query("api_key") apiKey: String?
     ): ApiResponse<MovieTrailer>
 
-    @FormUrlEncoded
     @GET("3/movie/{movie_id}")
     suspend fun getMovieDetails(
-        @Path("movieId") movieId: String?,
+        @Path("movie_id") movieId: String?,
         @Query("api_key") apiKey: String?
     ): ApiResponse<Movie>
 
