@@ -1,6 +1,5 @@
 package com.memad.moviesmix.ui.main.description
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.memad.moviesmix.data.local.FavouritesEntity
@@ -8,11 +7,8 @@ import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.repos.DescriptionRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
