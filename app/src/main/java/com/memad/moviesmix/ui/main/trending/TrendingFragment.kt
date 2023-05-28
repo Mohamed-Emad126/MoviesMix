@@ -14,21 +14,29 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
-import com.google.android.material.transition.MaterialFadeThrough
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentTrendingBinding
-import com.memad.moviesmix.utils.*
+import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.NetworkStatus
+import com.memad.moviesmix.utils.NetworkStatusHelper
+import com.memad.moviesmix.utils.Resource
+import com.memad.moviesmix.utils.getSnapPosition
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -99,15 +107,15 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
                     )
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView.apply {
-                            animate().setDuration(300).scaleX(1F).scaleY(1F)
-                                .setInterpolator(AccelerateInterpolator()).start()
-                        }
+                        animate().setDuration(300).scaleX(1F).scaleY(1F)
+                            .setInterpolator(AccelerateInterpolator()).start()
+                    }
                     snapPositionChange(snapHelper.getSnapPosition(recyclerView))
                 } else {
                     (viewHolder as TrendingAdapter.TrendingViewHolder).itemBinding.materialCardView.apply {
-                            animate().setDuration(300).scaleX(.75F).scaleY(.75F)
-                                .setInterpolator(AccelerateInterpolator()).start()
-                        }
+                        animate().setDuration(300).scaleX(.75F).scaleY(.75F)
+                            .setInterpolator(AccelerateInterpolator()).start()
+                    }
                 }
             }
         })
@@ -117,35 +125,38 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
 
     private fun setupObservables() {
         networkStatusHelper.observe(viewLifecycleOwner) {
-            this.error = when (it) {
-                is NetworkStatus.Available -> requireContext().resources.getString(
-                    R.string.something_went_wrong
-                )
-                is NetworkStatus.Unavailable -> requireContext().resources.getString(
-                    R.string.no_network
-                )
+            when (it) {
+                is NetworkStatus.Unavailable -> {
+                    Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
+                }
+
+                else -> {}
             }
         }
-        lifecycleScope.launchWhenStarted {
-            trendingViewModel.moviesResource.collect {
-                Log.d(TAG, "setupObservables: $it")
-                withContext(Dispatchers.Main) {
-                    when (it) {
-                        is Resource.Loading -> loading()
-                        is Resource.Error -> error(list = it.data!!)
-                        is Resource.Success -> success()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                trendingViewModel.moviesResource.collect {
+                    Log.d(TAG, "setupObservables: $it")
+                    withContext(Dispatchers.Main) {
+                        when (it) {
+                            is Resource.Loading -> loading()
+                            is Resource.Error -> error(list = it.data!!)
+                            is Resource.Success -> success()
+                        }
                     }
                 }
             }
         }
-        lifecycleScope.launchWhenStarted {
-            trendingViewModel.moviesList.collectLatest {
-                lastSize = trendingAdapter.trendingMoviesList.size
-                success()
-                Log.i(TAG, "setupObservables: ${it.size}")
-                trendingAdapter.trendingMoviesList = it
-                if (lastSize == 0) {
-                    handleDetailsUi(lastSize)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                trendingViewModel.moviesList.collectLatest {
+                    lastSize = trendingAdapter.trendingMoviesList.size
+                    success()
+                    Log.i(TAG, "setupObservables: ${it.size}")
+                    trendingAdapter.trendingMoviesList = it
+                    if (lastSize == 0) {
+                        handleDetailsUi(lastSize)
+                    }
                 }
             }
         }
@@ -159,7 +170,7 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
             binding.movieGenre.visibility = GONE
             binding.sparkButton.visibility = GONE
             binding.releaseYear.visibility = GONE
-            binding.backdropImage.load(R.drawable.start_img_min_blur){allowHardware(false)}
+            binding.backdropImage.load(R.drawable.start_img_min_blur) { allowHardware(false) }
             binding.progressPercent.text = ""
             binding.progressBar.progress = 0
         }
@@ -182,7 +193,7 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
         binding.releaseYear.visibility = GONE
         binding.progressPercent.text = ""
         createProgressAnimation(0.0)
-        binding.backdropImage.load(R.drawable.start_img_min_blur){allowHardware(false)}
+        binding.backdropImage.load(R.drawable.start_img_min_blur) { allowHardware(false) }
     }
 
     private fun handleDetailsUi(
@@ -192,7 +203,7 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener,
         binding.backdropImage.load(
             Constants.POSTER_BASE_URL + trendingAdapter.trendingMoviesList[position].movie?.backdrop_path
         ) {
-            transformations(BlurTransformation(requireContext(),3f, 3f))
+            transformations(BlurTransformation(requireContext(), 3f, 3f))
             crossfade(true)
             placeholder(R.drawable.start_img_min_blur)
             error(R.drawable.start_img_min_blur)

@@ -43,4 +43,12 @@
     <string name="permission_needed">اذن مطلوب</string>
     <string name="ok">حسنا</string>
     <string name="no_thanks">لا، شكرا</string>
+    <string name="banner_image">صورة البانر</string>
+    <string name="poster_image">البوستر</string>
+    <string name="description">التفاصيل</string>
+    <string name="genres">"النوع "</string>
+    <string name="cast">الممثلون</string>
+    <string name="related">"مرتبط "</string>
+    <string name="play_button">زر التشغيل</string>
+    <string name="download">تحميل</string>
 </resources>

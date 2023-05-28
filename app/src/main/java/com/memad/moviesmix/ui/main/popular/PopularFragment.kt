@@ -1,6 +1,7 @@
 package com.memad.moviesmix.ui.main.popular
 
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,14 +18,19 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.MaterialFadeThrough
+import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.gson.Gson
 import com.liaoinstan.springview.widget.SpringView
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentPopularBinding
 import com.memad.moviesmix.databinding.PosterDialogBinding
-import com.memad.moviesmix.utils.*
+import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.NetworkStatus
+import com.memad.moviesmix.utils.NetworkStatusHelper
+import com.memad.moviesmix.utils.Resource
+import com.memad.moviesmix.utils.createDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -53,6 +59,11 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         super.onCreate(savedInstanceState)
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
+        //exitTransition = MaterialElevationScale(false)
+        sharedElementReturnTransition =  MaterialContainerTransform().apply {
+            drawingViewId = R.id.main_nav_host_fragment
+            scrimColor = Color.TRANSPARENT
+        }
     }
 
     override fun onCreateView(
@@ -60,8 +71,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPopularBinding.inflate(inflater, container, false)
-        postponeEnterTransition()
-        binding.root.doOnPreDraw { startPostponedEnterTransition() }
         setupObservables()
         initRecyclerView()
         _posterDialogBinding = PosterDialogBinding.inflate(inflater)
@@ -85,15 +94,13 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
     private fun setupObservables() {
         networkStatusHelper.observe(viewLifecycleOwner) {
-            this.error = when (it) {
-                is NetworkStatus.Available -> requireContext().resources.getString(
-                    R.string.something_went_wrong
-                )
-                is NetworkStatus.Unavailable -> requireContext().resources.getString(
-                    R.string.no_network
-                )
+            when (it) {
+                is NetworkStatus.Unavailable -> {
+                    Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
+                }
+
+                else -> {}
             }
-            Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -115,6 +122,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
                             loading()
                         }
                     }
+
                     is Resource.Error -> error(popularViewModel.moviesListLiveData.value?.toMutableList())
                     is Resource.Success -> success()
                 }
@@ -187,15 +195,13 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
     }
 
     override fun onMovieClicked(position: Int, imageView: ShapeableImageView) {
-        Toast.makeText(context, "single", Toast.LENGTH_SHORT).show()
         val extras = FragmentNavigatorExtras(
-            imageView to popularAdapter.currentList[position].movieId.toString()
+            imageView to position.toString()
         )
         findNavController().navigate(
             PopularFragmentDirections.actionPopularFragmentToMovieDescriptionFragment(
                 Gson().toJson(popularAdapter.currentList[position]),
-                popularAdapter.currentList[position].movieId.toString(),
-                popularAdapter.currentList[position].movie?.poster_path!!
+                position.toString()
             ),
             extras
         )

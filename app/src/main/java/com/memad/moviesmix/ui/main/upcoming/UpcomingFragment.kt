@@ -13,7 +13,8 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.transition.MaterialFadeThrough
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentUpcomingBinding
@@ -24,8 +25,8 @@ import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.getSnapPosition
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -77,7 +78,7 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
         upcomingLoadingAdapter.errorClickListener = this
         snapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.upcomingRecyclerView)
-        binding.upcomingRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+        binding.upcomingRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -91,22 +92,21 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
         if (snapPosition == upcomingAdapter.upcomingMoviesList.size - 1) {
             upcomingViewModel.loadNextPage()
         } else {
-            binding.releaseDate.text = upcomingAdapter.upcomingMoviesList[snapPosition].movie?.release_date
+            binding.releaseDate.text =
+                upcomingAdapter.upcomingMoviesList[snapPosition].movie?.release_date
         }
     }
 
     private fun setupObservers() {
-        networkStatusHelper.observe(viewLifecycleOwner, {
-            this.error = when (it) {
-                is NetworkStatus.Available -> context!!.resources.getString(
-                    R.string.something_went_wrong
-                )
-                is NetworkStatus.Unavailable -> context!!.resources.getString(
-                    R.string.no_network
-                )
+        networkStatusHelper.observe(viewLifecycleOwner) {
+            when (it) {
+                is NetworkStatus.Unavailable -> {
+                    Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
+                }
+                else -> {}
             }
-        })
-        lifecycleScope.launchWhenStarted {
+        }
+        lifecycleScope.launch {
             upcomingViewModel.moviesResource.collect {
                 withContext(Dispatchers.Main) {
                     when (it) {
@@ -117,13 +117,12 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
                 }
             }
         }
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launch {
             upcomingViewModel.moviesList.collectLatest {
                 upcomingAdapter.upcomingMoviesList = it
             }
         }
     }
-
 
 
     private fun loading() {
@@ -132,7 +131,7 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
     }
 
     private fun error(list: List<MovieEntity>) {
-        if (list.isNullOrEmpty()) {
+        if (list.isEmpty()) {
             upcomingLoadingAdapter.error()
             binding.releaseDate.text = error
         }

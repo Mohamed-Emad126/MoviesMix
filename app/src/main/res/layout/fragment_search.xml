@@ -14,15 +14,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipChildren="false"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:navigationIcon="@drawable/ic_arrow_back">
+        app:buttonGravity="center_vertical"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:gravity="center_vertical"
+            android:padding="8dp"
             android:orientation="horizontal">
 
             <EditText

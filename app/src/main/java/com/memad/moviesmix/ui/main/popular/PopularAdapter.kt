@@ -3,16 +3,15 @@ package com.memad.moviesmix.ui.main.popular
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.MoviePopularItemBinding
-import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.DoubleClickListener
 import javax.inject.Inject
@@ -42,7 +41,7 @@ class PopularAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
-        holder.itemBinding.posterImage.transitionName = getItem(position).movieId.toString()
+        ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
         holder.itemBinding.posterImage
             .load(
                 Constants.POSTER_BASE_URL +

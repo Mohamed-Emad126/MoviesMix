@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/image_card"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="35dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/poster_dialog_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/start_img_min"
+            app:shapeAppearanceOverlay="@style/popularImageShape" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/cast_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:textSize="12sp"
+        android:textAlignment="center"
+        android:ellipsize="end"
+        android:textColor="@color/material_dynamic_neutral20"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@id/image_card"
+        app:layout_constraintStart_toStartOf="@id/image_card"
+        app:layout_constraintEnd_toEndOf="@id/image_card"
+        tools:text="@tools:sample/full_names"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

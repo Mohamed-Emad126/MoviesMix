@@ -1,12 +1,11 @@
 package com.memad.moviesmix.ui.main.favourites
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.material.transition.MaterialFadeThrough
-import com.memad.moviesmix.R
+import androidx.fragment.app.Fragment
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.memad.moviesmix.databinding.FragmentFavouritesBinding
 import dagger.hilt.android.AndroidEntryPoint
 

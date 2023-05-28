@@ -8,6 +8,8 @@ import com.google.gson.Gson
 import com.memad.moviesmix.di.annotations.SessionKey
 import com.memad.moviesmix.models.AuthResponse
 import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.DownloadFile
+import com.memad.moviesmix.utils.Downloader
 import com.memad.moviesmix.utils.SharedPreferencesHelper
 import dagger.Module
 import dagger.Provides
@@ -45,5 +47,11 @@ class UtilsModule {
             gson.toJson(AuthResponse("", "", false))
         )
         return gson.fromJson(session, AuthResponse::class.java).guest_session_id
+    }
+
+    @Singleton
+    @Provides
+    fun provideDownload(@ApplicationContext context: Context): Downloader {
+        return DownloadFile(context)
     }
 }

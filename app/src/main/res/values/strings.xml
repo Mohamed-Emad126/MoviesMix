@@ -43,4 +43,12 @@
     <string name="permission_needed">Permission needed</string>
     <string name="ok">OK</string>
     <string name="no_thanks">No thanks</string>
+    <string name="banner_image">Banner Image</string>
+    <string name="poster_image">Poster Image</string>
+    <string name="description">Description</string>
+    <string name="genres">Genres</string>
+    <string name="cast">Cast</string>
+    <string name="related">Related</string>
+    <string name="play_button">play Button</string>
+    <string name="download">Download</string>
 </resources>

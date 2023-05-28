@@ -9,22 +9,16 @@
         android:id="@+id/popularFragment"
         android:name="com.memad.moviesmix.ui.main.popular.PopularFragment"
         android:label="fragment_popular"
-        tools:layout="@layout/fragment_popular" >
+        tools:layout="@layout/fragment_popular">
         <action
             android:id="@+id/action_popularFragment_to_movieDescriptionFragment"
-            app:destination="@id/movieDescriptionFragment" >
+            app:destination="@id/movieDescriptionFragment">
             <argument
                 android:name="movie"
-                app:argType="string"
-                />
+                app:argType="string" />
             <argument
                 android:name="movieId"
-                app:argType="string"
-                />
-            <argument
-                android:name="moviePoster"
-                app:argType="string"
-                />
+                app:argType="string" />
         </action>
     </fragment>
     <fragment
@@ -65,15 +59,41 @@
         tools:layout="@layout/fragment_movie_description">
         <argument
             android:name="movie"
-            app:argType="string"
-            />
+            app:argType="string" />
         <argument
             android:name="movieId"
-            app:argType="string"
-            />
+            app:argType="string" />
+        <action
+            android:id="@+id/action_movieDescriptionFragment_self"
+            app:destination="@id/movieDescriptionFragment">
+            <argument
+                android:name="movie"
+                app:argType="string" />
+            <argument
+                android:name="movieId"
+                app:argType="string" />
+        </action>
+        <action
+            android:id="@+id/action_movieDescriptionFragment_to_viewerFragment"
+            app:destination="@id/viewerFragment">
+            <argument
+                android:name="url"
+                app:argType="string" />
+            <argument
+                android:name="movieId"
+                app:argType="string" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/viewerFragment"
+        android:name="com.memad.moviesmix.ui.main.viewer.ViewerFragment"
+        android:label="fragment_viewer"
+        tools:layout="@layout/fragment_viewer">
         <argument
-            android:name="moviePoster"
-            app:argType="string"
-            />
+            android:name="url"
+            app:argType="string" />
+        <argument
+            android:name="movieId"
+            app:argType="string" />
     </fragment>
 </navigation>

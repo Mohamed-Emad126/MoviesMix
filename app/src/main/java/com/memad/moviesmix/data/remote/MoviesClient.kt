@@ -1,5 +1,6 @@
 package com.memad.moviesmix.data.remote
 
+import com.memad.moviesmix.models.CastResponse
 import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.models.MovieTrailer
 import com.memad.moviesmix.models.MoviesResponse
@@ -60,4 +61,19 @@ interface MoviesClient {
         @Query("query") query: String?,
         @Query("page") page: Int
     ): ApiResponse<MoviesResponse>
+
+
+    @GET("/3/movie/{movieId}/similar?page=1")
+    suspend fun getSimilarMovies(
+        @Path("movieId") movieId: String?,
+        @Query("api_key") apiKey: String?
+    ): ApiResponse<MoviesResponse>
+
+    @GET("/3/movie/{movieId}/credits?")
+    suspend fun getCastOfMovie(
+        @Path("movieId") movieId: String?,
+        @Query("api_key") apiKey: String?
+    ): ApiResponse<CastResponse>
+
+
 }

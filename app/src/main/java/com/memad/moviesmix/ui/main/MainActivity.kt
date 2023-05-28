@@ -11,7 +11,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.navigation.*
-import com.google.android.material.transition.MaterialSharedAxis
+import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ActivityMainBinding
 import com.memad.moviesmix.ui.main.search.SearchFragmentDirections
@@ -37,7 +37,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         mutableListOf(
             R.id.searchFragment,
             R.id.settingsFragment,
-            R.id.movieDescriptionFragment
+            R.id.movieDescriptionFragment,
+            R.id.viewerFragment
         )
     }
     private val currentNavigationFragment: Fragment?

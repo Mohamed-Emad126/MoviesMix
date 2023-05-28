@@ -74,7 +74,7 @@ class OnBoardingFragment : Fragment(), ViewPager.OnPageChangeListener {
                     MainActivity::class.java
                 )
             )
-            activity?.finish()
+            requireActivity().finish()
         }
         return binding.root
     }

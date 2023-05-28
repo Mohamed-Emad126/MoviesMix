@@ -1,8 +1,9 @@
 package com.memad.moviesmix.utils
 
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.content.PermissionChecker
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.memad.moviesmix.R
@@ -54,8 +55,7 @@ fun Context.checkmPermission(
 ) {
 
     when {
-        PermissionChecker.checkSelfPermission(this, permission)
-                == PermissionChecker.PERMISSION_GRANTED -> {
+        ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> {
             ifGrantedFunction()
         }
         fragment.shouldShowRequestPermissionRationale(permission) -> {
@@ -68,4 +68,3 @@ fun Context.checkmPermission(
         }
     }
 }
-
