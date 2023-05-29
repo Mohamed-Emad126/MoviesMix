@@ -1,9 +1,9 @@
-package com.memad.moviesmix.utils
+package com.memad.moviesmix.ui.main.viewer.worker
 
-import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -11,10 +11,7 @@ class DownloadCompletedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == "android.intent.action.DOWNLOAD_COMPLETE") {
-            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
-            if (id != -1L) {
-                println("Download with ID $id finished!")
-            }
+            Toast.makeText(context, "Download Completed", Toast.LENGTH_SHORT).show()
         }
     }
 }

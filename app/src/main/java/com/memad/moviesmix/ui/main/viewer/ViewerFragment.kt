@@ -12,15 +12,20 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.work.BackoffPolicy
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import coil.load
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.FragmentViewerBinding
-import com.memad.moviesmix.utils.Downloader
+import com.memad.moviesmix.ui.main.viewer.worker.DownloadImageWorker
 import com.memad.moviesmix.utils.checkmPermission
 import com.memad.moviesmix.utils.unAvailableFeature
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import java.time.Duration
 
 
 @AndroidEntryPoint
@@ -29,8 +34,7 @@ class ViewerFragment : Fragment() {
     private val binding get() = _binding!!
     private val args by navArgs<ViewerFragmentArgs>()
 
-    @Inject
-    lateinit var downloadFile: Downloader
+    private lateinit var oneTimeWork: OneTimeWorkRequest
 
 
     private val saveImageUnavailableMessage = "Save Image feature is unavailable " +
@@ -61,7 +65,7 @@ class ViewerFragment : Fragment() {
         _binding = FragmentViewerBinding.inflate(inflater, container, false)
 
         ViewCompat.setTransitionName(binding.imageView, args.movieId)
-
+        initWorker()
         binding.imageView.load(args.url) {
             crossfade(true)
             placeholder(R.drawable.start_img_min_blur)
@@ -76,7 +80,7 @@ class ViewerFragment : Fragment() {
         saveImagePermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
                 if (isGranted) {
-                    downloadFile.downloadFile(args.url)
+                    WorkManager.getInstance(requireContext()).enqueue(oneTimeWork)
                 } else {
                     requireContext().unAvailableFeature(
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -92,13 +96,13 @@ class ViewerFragment : Fragment() {
                     this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     {
-                        downloadFile.downloadFile(args.url)
+                        WorkManager.getInstance(requireContext()).enqueue(oneTimeWork)
                     },
                     saveImageNeededMessage,
                     saveImagePermissionLauncher
                 )
             } else {
-                downloadFile.downloadFile(args.url)
+                WorkManager.getInstance(requireContext()).enqueue(oneTimeWork)
             }
         }
         return binding.root
@@ -113,5 +117,18 @@ class ViewerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
         binding.imageView.doOnPreDraw { startPostponedEnterTransition() }
+    }
+
+    private fun initWorker() {
+        val data = Data.Builder()
+            .putString("imageUrl", args.url)
+            .build()
+        oneTimeWork = OneTimeWorkRequestBuilder<DownloadImageWorker>()
+            .setInputData(data)
+            .setBackoffCriteria(
+                backoffPolicy = BackoffPolicy.LINEAR,
+                duration = Duration.ofSeconds(10)
+            )
+            .build()
     }
 }

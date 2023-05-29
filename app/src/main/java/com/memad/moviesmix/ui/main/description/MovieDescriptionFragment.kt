@@ -22,6 +22,7 @@ import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentMovieDescriptionBinding
+import com.memad.moviesmix.models.Cast
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Constants.RECOMMENDED
 import com.memad.moviesmix.utils.GenresUtils
@@ -34,7 +35,8 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListener {
+class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListener,
+    CastsAdapter.OnCastClickListener {
     private var _binding: FragmentMovieDescriptionBinding? = null
     private val binding get() = _binding!!
 
@@ -77,6 +79,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
     private fun initCasts() {
         binding.recyclerViewCast.adapter = castsAdapter
         binding.recyclerViewCast.setHasFixedSize(true)
+        castsAdapter.castClickListener = this
     }
 
     private fun initRecommendations() {
@@ -218,6 +221,17 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
             MovieDescriptionFragmentDirections.actionMovieDescriptionFragmentSelf(
                 Gson().toJson(MovieEntity(movieResult.id, RECOMMENDED, 1, movieResult)),
                 position.toString()
+            ),
+            extras
+        )
+    }
+    override fun onCastClick(position: Int, cast: Cast, imageView: ShapeableImageView) {
+        val extras = FragmentNavigatorExtras(
+            imageView to position.toString()
+        )
+        findNavController().navigate(
+            MovieDescriptionFragmentDirections.actionMovieDescriptionFragmentToViewerFragment(
+                Constants.POSTER_BASE_URL + cast.profile_path, position.toString()
             ),
             extras
         )

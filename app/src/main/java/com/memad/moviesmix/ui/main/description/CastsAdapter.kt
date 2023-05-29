@@ -2,10 +2,12 @@ package com.memad.moviesmix.ui.main.description
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.android.material.imageview.ShapeableImageView
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ItemCastBinding
 import com.memad.moviesmix.models.Cast
@@ -14,7 +16,7 @@ import javax.inject.Inject
 
 class CastsAdapter @Inject constructor() :
     ListAdapter<Cast, CastsAdapter.CastViewHolder>(MoviesCastDiffCallBack) {
-
+    var castClickListener: OnCastClickListener? = null
     override fun submitList(list: MutableList<Cast>?) {
         val oldSize = list?.size ?: 0
         super.submitList(list)
@@ -36,6 +38,7 @@ class CastsAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: CastViewHolder, position: Int) {
+        ViewCompat.setTransitionName(holder.itemBinding.posterDialogImage, position.toString())
         val cast = getItem(position)
         holder.itemBinding.posterDialogImage.load(
             Constants.POSTER_BASE_URL +
@@ -63,7 +66,24 @@ class CastsAdapter @Inject constructor() :
     /////////////////////////ViewHolder//////////////////////////////
     /////////////////////////////////////////////////////////////////
     inner class CastViewHolder(val itemBinding: ItemCastBinding) :
-        RecyclerView.ViewHolder(itemBinding.root)
+        RecyclerView.ViewHolder(itemBinding.root) {
+        init {
+            itemBinding.posterDialogImage.setOnClickListener {
+                castClickListener?.onCastClick(
+                    absoluteAdapterPosition,
+                    getItem(absoluteAdapterPosition),
+                    itemBinding.posterDialogImage
+                )
+            }
+        }
+
+
+    }
+
+    interface OnCastClickListener {
+        fun onCastClick(position: Int, cast: Cast, imageView: ShapeableImageView)
+    }
+
 }
 
 object MoviesCastDiffCallBack : DiffUtil.ItemCallback<Cast>() {
