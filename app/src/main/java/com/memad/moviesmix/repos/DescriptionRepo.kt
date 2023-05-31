@@ -5,6 +5,7 @@ import com.memad.moviesmix.data.remote.MoviesClient
 import com.memad.moviesmix.models.CastResponse
 import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.models.MoviesResponse
+import com.memad.moviesmix.models.VideosResponse
 import com.memad.moviesmix.utils.AccessNative
 import com.memad.moviesmix.utils.Resource
 import com.skydoves.sandwich.getOrNull
@@ -39,6 +40,19 @@ class DescriptionRepo @Inject constructor(
 
     suspend fun getCasts(movieId: String) = flow<Resource<CastResponse?>> {
         val response = moviesClient.getCastOfMovie(movieId, AccessNative.getApiKey())
+        response.suspendOnSuccess {
+            emit(Resource.Success(response.getOrNull()))
+        }
+            .suspendOnError {
+                emit(Resource.Error(message(), null))
+            }
+            .suspendOnFailure {
+                emit(Resource.Error(message(), null))
+            }
+    }
+
+    fun getVideos(toString: String) = flow<Resource<VideosResponse?>> {
+        val response = moviesClient.getVideosOfMovie(toString, AccessNative.getApiKey())
         response.suspendOnSuccess {
             emit(Resource.Success(response.getOrNull()))
         }

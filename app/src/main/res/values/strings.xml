@@ -51,4 +51,5 @@
     <string name="related">Related</string>
     <string name="play_button">play Button</string>
     <string name="download">Download</string>
+    <string name="video_not_available">No videos available for this movie!!</string>
 </resources>

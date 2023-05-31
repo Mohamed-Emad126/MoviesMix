@@ -7,9 +7,9 @@ import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.memad.moviesmix.di.annotations.SessionKey
 import com.memad.moviesmix.models.AuthResponse
-import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.ui.main.viewer.worker.DownloadFile
 import com.memad.moviesmix.ui.main.viewer.worker.Downloader
+import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.SharedPreferencesHelper
 import dagger.Module
 import dagger.Provides

@@ -1,6 +1,6 @@
 package com.memad.moviesmix.models
 
-data class MovieTrailer(
+data class VideosResponse(
     val id: Int,
     val results: List<Result>
 ) {
