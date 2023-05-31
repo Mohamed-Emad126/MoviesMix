@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/movie_card"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -37,7 +38,24 @@
             android:text="7.7"
             android:textColor="@color/goldEndColor"
             android:textSize="14sp"
-            app:drawableStartCompat="@drawable/star" />
-
+            app:drawableStartCompat="@drawable/star"
+            tools:ignore="HardcodedText" />
     </FrameLayout>
+    <com.varunest.sparkbutton.SparkButton
+        android:id="@+id/button_favorite_popular"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="16dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="10dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:src="@drawable/heart_inactive"
+        app:sparkbutton_activeImage="@drawable/heart_active"
+        app:sparkbutton_iconSize="50dp"
+        app:sparkbutton_inActiveImage="@drawable/heart_inactive"
+        app:sparkbutton_primaryColor="@color/spark_primary_color"
+        app:sparkbutton_secondaryColor="@color/secondaryColor" />
 </com.google.android.material.card.MaterialCardView>

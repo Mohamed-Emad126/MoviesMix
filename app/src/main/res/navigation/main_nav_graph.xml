@@ -40,10 +40,22 @@
         android:id="@+id/searchFragment"
         android:name="com.memad.moviesmix.ui.main.search.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_movieDescriptionFragment"
+            app:destination="@id/movieDescriptionFragment" >
+            <argument
+                android:name="movie"
+                app:argType="string" />
+            <argument
+                android:name="movieId"
+                app:argType="string" />
+        </action>
+    </fragment>
     <action
         android:id="@+id/action_global_searchFragment"
-        app:destination="@id/searchFragment" />
+        app:destination="@id/searchFragment" >
+    </action>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.memad.moviesmix.ui.main.settings.SettingsFragment"
@@ -51,7 +63,8 @@
         tools:layout="@layout/fragment_settings" />
     <action
         android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment" />
+        app:destination="@id/settingsFragment" >
+    </action>
     <fragment
         android:id="@+id/movieDescriptionFragment"
         android:name="com.memad.moviesmix.ui.main.description.MovieDescriptionFragment"

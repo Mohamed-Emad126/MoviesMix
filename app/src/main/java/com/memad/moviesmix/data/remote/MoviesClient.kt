@@ -46,7 +46,8 @@ interface MoviesClient {
     suspend fun searchInMovies(
         @Query("api_key") apiKey: String?,
         @Query("query") query: String?,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("include_adult") includeAdult: Boolean = false
     ): ApiResponse<MoviesResponse>
 
 

@@ -49,10 +49,10 @@ class MovieDescriptionViewModel @Inject constructor(
     fun addToFavourites(entity: MovieEntity) {
         viewModelScope.launch {
             descriptionRepo.favouriteAMovie(
-                FavouritesEntity(entity.movieId, entity.movie)
+                FavouritesEntity(entity.movie?.id, entity.movie)
             )
         }
-        checkIsFavourites(entity.movieId!!)
+        checkIsFavourites(entity.movie?.id!!)
     }
 
     fun removeFromFavourites(movieId: Int) {

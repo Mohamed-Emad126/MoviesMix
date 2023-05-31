@@ -26,6 +26,7 @@ class StartActivity : AppCompatActivity() {
     @Inject
     @SessionKey
     lateinit var sessionKey: String
+
     @Inject
     lateinit var preferencesHelper: SharedPreferencesHelper
 
@@ -35,6 +36,7 @@ class StartActivity : AppCompatActivity() {
         applyCurrentTheme()
         if (sessionKey.isNotEmpty()) {
             startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
         //setTheme(R.style.Theme_MoviesMix)
         binding = ActivityStartBinding.inflate(layoutInflater)
@@ -57,9 +59,11 @@ class StartActivity : AppCompatActivity() {
                 Constants.DARK -> {
                     AppCompatDelegate.MODE_NIGHT_YES
                 }
+
                 Constants.LIGHT -> {
                     AppCompatDelegate.MODE_NIGHT_NO
                 }
+
                 else -> {
                     AppCompatDelegate.MODE_NIGHT_NO
                 }

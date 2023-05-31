@@ -6,6 +6,7 @@
     android:background="?attr/colorSurface"
     android:orientation="vertical"
     android:transitionGroup="true"
+    android:animateLayoutChanges="true"
     tools:context=".ui.main.search.SearchFragment"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -29,13 +30,15 @@
             android:orientation="horizontal">
 
             <EditText
+                android:id="@+id/search_edit"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@null"
                 android:hint="@string/search"
                 android:imeOptions="flagNoExtractUi|actionSearch"
-                android:inputType="textNoSuggestions" />
+                android:inputType="textNoSuggestions"
+                android:autofillHints="name" />
 
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
@@ -43,19 +46,33 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/white"
+        android:background="?attr/actionBarDivider"
         android:backgroundTint="@color/material_on_surface_stroke" />
 
-    <ScrollView
+    <com.liaoinstan.springview.widget.SpringView
+        android:id="@+id/spring_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/with_alpha"
-        android:scrollbars="none">
+        android:animateLayoutChanges="true"
+        app:footer="@layout/loading_header">
 
-        <LinearLayout
-            android:id="@+id/search_suggestion_container"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:saveEnabled="true"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/search_toolbar"
+            tools:listitem="@layout/search_result_item" />
+    </com.liaoinstan.springview.widget.SpringView>
+
+    <include
+        android:id="@+id/loading_layout"
+        layout="@layout/loading_layout"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/empty_layout"
+        layout="@layout/empty_layout"
+        android:visibility="gone" />
 </LinearLayout>

@@ -1,6 +1,9 @@
 package com.memad.moviesmix.ui.main.popular
 
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.ViewCompat
@@ -19,12 +22,17 @@ import javax.inject.Inject
 class PopularAdapter @Inject constructor() :
     ListAdapter<MovieEntity, PopularAdapter.PopularViewHolder>(MoviesDiffCallBack) {
 
+    var favouritesList: MutableList<Boolean> = mutableListOf()
     lateinit var popularMovieClickListener: OnMoviesClickListener
 
     override fun submitList(list: MutableList<MovieEntity>?) {
         val oldSize = list?.size ?: 0
         super.submitList(list)
         notifyItemRangeInserted(oldSize, 20)
+    }
+
+    fun submitFavouritesList(it: MutableList<Boolean>) {
+        favouritesList = it
     }
 
     /////////////////////////////////////////////////////////////////
@@ -39,9 +47,27 @@ class PopularAdapter @Inject constructor() :
         )
     }
 
+    fun favouriteAnimation(position: Int) {
+        notifyItemChanged(position)
+
+    }
+
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
         ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
+        if (favouritesList.isNotEmpty() && favouritesList[position]) {
+            holder.itemBinding.buttonFavoritePopular.visibility = View.VISIBLE
+            holder.itemBinding.buttonFavoritePopular.isChecked = true
+            holder.itemBinding.buttonFavoritePopular.isActivated = true
+        } else {
+            holder.itemBinding.buttonFavoritePopular.isChecked = false
+            holder.itemBinding.buttonFavoritePopular.isActivated = false
+        }
+        holder.itemBinding.buttonFavoritePopular.playAnimation()
+        Handler(Looper.getMainLooper()).postDelayed({
+            holder.itemBinding.buttonFavoritePopular.visibility = View.GONE
+        }, 1000)
+
         holder.itemBinding.posterImage
             .load(
                 Constants.POSTER_BASE_URL +

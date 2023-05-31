@@ -1,4 +1,5 @@
 package com.memad.moviesmix.utils
+
 object GenresUtils {
     private val map = hashMapOf<Int, String>().apply {
         put(28, "Action")
@@ -29,6 +30,8 @@ object GenresUtils {
             }
         }
     }
+
+    fun getGenre(id: Int) = map[id]
 }
 
 

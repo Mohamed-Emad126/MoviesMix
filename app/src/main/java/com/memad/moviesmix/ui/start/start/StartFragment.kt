@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.FragmentStartBinding
 import com.memad.moviesmix.databinding.LoadingDialogBinding
-import com.memad.moviesmix.models.AuthResponse
 import com.memad.moviesmix.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -57,7 +56,7 @@ class StartFragment : Fragment() {
                 }
                 is Resource.Error -> {
                     loadingDialog.dismiss()
-                    handleErrorState(response)
+                    handleErrorState()
                 }
                 is Resource.Loading -> {
                     loadingDialog.show()
@@ -67,12 +66,10 @@ class StartFragment : Fragment() {
         return binding.root
     }
 
-    private fun handleErrorState(response: Resource<AuthResponse>) {
+    private fun handleErrorState() {
         if (networkStatus is NetworkStatus.Unavailable) {
             Toast.makeText(activity, "No network connection!", Toast.LENGTH_SHORT)
                 .show()
-        } else {
-            Toast.makeText(activity, response.errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
 

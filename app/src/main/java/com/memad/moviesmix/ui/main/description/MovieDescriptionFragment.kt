@@ -135,7 +135,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
                 binding.buttonFavorite.playAnimation()
             } else {
                 binding.buttonFavorite.isChecked = false
-                movieDescriptionViewModel.removeFromFavourites(args.movieId.toInt())
+                movieEntity.movie?.let { it1 -> movieDescriptionViewModel.removeFromFavourites(it1.id) }
             }
         }
 

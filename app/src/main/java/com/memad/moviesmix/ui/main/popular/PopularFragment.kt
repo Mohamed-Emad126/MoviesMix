@@ -3,16 +3,16 @@ package com.memad.moviesmix.ui.main.popular
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import coil.load
@@ -60,7 +60,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
         //exitTransition = MaterialElevationScale(false)
-        sharedElementReturnTransition =  MaterialContainerTransform().apply {
+        sharedElementReturnTransition = MaterialContainerTransform().apply {
             drawingViewId = R.id.main_nav_host_fragment
             scrimColor = Color.TRANSPARENT
         }
@@ -130,16 +130,16 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         }
         viewLifecycleOwner.lifecycleScope.launch {
             popularViewModel.moviesList.collectLatest {
-                Log.i(
-                    "TAG: popp:",
-                    "${it.size} :-> ${popularAdapter.currentList.size}"
-                )
                 //popularAdapter.popularMoviesList = it
                 popularAdapter.submitList(it.toMutableList())
-                Log.i(
-                    "TAG: popp:",
-                    "${it.size} :-> ${popularAdapter.currentList.size}"
-                )
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                popularViewModel.checkFavouritesFlow.collectLatest {
+                    popularAdapter.submitFavouritesList(it)
+                }
             }
         }
     }
@@ -173,7 +173,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         } else {
             binding.springView.visibility = View.VISIBLE
             binding.errorLayout.errorLayout.visibility = View.GONE
-            //Toast.makeText(context, this.error, Toast.LENGTH_SHORT).show()
         }
         binding.loadingLayout.loadingLayout.visibility = View.GONE
         binding.springView.onFinishFreshAndLoad()
@@ -208,7 +207,8 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
     }
 
     override fun onMovieDoubleClicked(position: Int, imageView: ImageView?) {
-        Toast.makeText(context, "Double", Toast.LENGTH_SHORT).show()
+        popularAdapter.favouriteAnimation(position)
+        popularViewModel.addToFavourites(popularAdapter.currentList[position])
     }
 
     override fun onMovieHoldDown(position: Int) {
@@ -229,5 +229,10 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
         view.doOnPreDraw { startPostponedEnterTransition() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        popularViewModel.checkIsFavourites()
     }
 }

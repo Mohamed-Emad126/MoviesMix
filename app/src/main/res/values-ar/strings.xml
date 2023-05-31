@@ -51,5 +51,6 @@
     <string name="related">"مرتبط "</string>
     <string name="play_button">زر التشغيل</string>
     <string name="download">تحميل</string>
-    <string name="video_not_available">No videos avilable for this movie!!</string>
+    <string name="video_not_available">لا توجد فيديوهات لهذا الفيلم</string>
+    <string name="no_movies_found">"لا توجد نتائج لـ %s "</string>
 </resources>
