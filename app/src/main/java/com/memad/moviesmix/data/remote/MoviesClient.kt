@@ -2,9 +2,9 @@ package com.memad.moviesmix.data.remote
 
 import com.memad.moviesmix.models.CastResponse
 import com.memad.moviesmix.models.Movie
-import com.memad.moviesmix.models.MovieTrailer
 import com.memad.moviesmix.models.MoviesResponse
 import com.memad.moviesmix.models.RateResponse
+import com.memad.moviesmix.models.VideosResponse
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.*
 
@@ -17,13 +17,6 @@ interface MoviesClient {
         @Query("api_key") apiKey: String?,
         @Query("guest_session_id") sessionId: String?
     ): ApiResponse<RateResponse>
-
-    @FormUrlEncoded
-    @GET("/3/movie/{movie_id}/videos")
-    suspend fun getMovieTrailer(
-        @Path("movieId") movieId: String?,
-        @Query("api_key") apiKey: String?
-    ): ApiResponse<MovieTrailer>
 
     @GET("3/movie/{movie_id}")
     suspend fun getMovieDetails(
@@ -49,12 +42,6 @@ interface MoviesClient {
         @Query("page") page: Int
     ): ApiResponse<MoviesResponse>
 
-    @GET("/3/movie/{movie_id}/recommendations")
-    suspend fun getRecommendationsMovies(
-        @Path("movieId") movieId: String?,
-        @Query("api_key") apiKey: String?
-    ): ApiResponse<MoviesResponse>
-
     @GET("/3/search/movie")
     suspend fun searchInMovies(
         @Query("api_key") apiKey: String?,
@@ -75,5 +62,9 @@ interface MoviesClient {
         @Query("api_key") apiKey: String?
     ): ApiResponse<CastResponse>
 
-
+    @GET("/3/movie/{movieId}/videos?")
+    suspend fun getVideosOfMovie(
+        @Path("movieId") movieId: String?,
+        @Query("api_key") apiKey: String?
+    ): ApiResponse<VideosResponse>
 }

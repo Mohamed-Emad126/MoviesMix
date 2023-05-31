@@ -82,6 +82,9 @@
             <argument
                 android:name="movieId"
                 app:argType="string" />
+            <argument
+                android:name="isVideo"
+                app:argType="boolean" />
         </action>
     </fragment>
     <fragment
@@ -95,5 +98,8 @@
         <argument
             android:name="movieId"
             app:argType="string" />
+        <argument
+            android:name="isVideo"
+            app:argType="boolean" />
     </fragment>
 </navigation>

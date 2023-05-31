@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
@@ -23,6 +24,7 @@ import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentMovieDescriptionBinding
 import com.memad.moviesmix.models.Cast
+import com.memad.moviesmix.models.VideosResponse
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Constants.RECOMMENDED
 import com.memad.moviesmix.utils.GenresUtils
@@ -37,6 +39,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListener,
     CastsAdapter.OnCastClickListener {
+    private lateinit var videosResponse: List<VideosResponse.Result>
     private var _binding: FragmentMovieDescriptionBinding? = null
     private val binding get() = _binding!!
 
@@ -68,8 +71,8 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
         _binding = FragmentMovieDescriptionBinding.inflate(inflater, container, false)
         movieEntity = Gson().fromJson(args.movie, MovieEntity::class.java)
         ViewCompat.setTransitionName(binding.posterImage, args.movieId)
-        initViews()
         init()
+        initViews()
         initRecommendations()
         initCasts()
         setupObservers()
@@ -114,10 +117,10 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
         }
 
         binding.posterImage.setOnClickListener {
-            toViewer(movieEntity.movie?.poster_path!!)
+            toViewer(movieEntity.movie?.poster_path!!, false)
         }
         binding.detailsBannerImage.setOnClickListener {
-            toViewer(movieEntity.movie?.backdrop_path!!)
+            toViewer(movieEntity.movie?.backdrop_path!!, false)
         }
 
         binding.buttonBack.setOnClickListener {
@@ -141,15 +144,51 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
                 binding.textGenres.addChip(requireContext(), it)
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                movieDescriptionViewModel.videos.collectLatest {
+                    when (it) {
+                        is Resource.Success -> {
+                            binding.fabPlayButton.visibility = View.VISIBLE
+                            videosResponse = it.data?.results!!
+                        }
+
+                        is Resource.Error -> {
+                            binding.fabPlayButton.visibility = View.GONE
+                        }
+
+                        is Resource.Loading -> {
+                            binding.fabPlayButton.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+        }
+        binding.fabPlayButton.setOnClickListener {
+            var allUrls = videosResponse
+            allUrls = allUrls.filter {
+                it.site == "YouTube" && it.type == "Trailer" && it.official
+            }
+            if (movieEntity.movie?.video == true || allUrls.isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.video_not_available),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                toViewer(allUrls.joinToString(separator = "**") { it.key }, true)
+            }
+        }
     }
 
-    private fun toViewer(url: String) {
+    private fun toViewer(url: String, isVideo: Boolean) {
         val extras = FragmentNavigatorExtras(
             binding.posterImage to args.movieId
         )
         val action =
             MovieDescriptionFragmentDirections.actionMovieDescriptionFragmentToViewerFragment(
-                Constants.POSTER_BASE_URL + url, args.movieId
+                url, args.movieId, isVideo
             )
         findNavController().navigate(action, extras)
     }
@@ -197,6 +236,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
             movieDescriptionViewModel.checkIsFavourites(it.id)
             movieDescriptionViewModel.getSimilarMovies(it.id.toString())
             movieDescriptionViewModel.getCastOfMovie(it.id.toString())
+            movieDescriptionViewModel.getVideo(it.id.toString())
         }
     }
 
@@ -225,13 +265,14 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
             extras
         )
     }
+
     override fun onCastClick(position: Int, cast: Cast, imageView: ShapeableImageView) {
         val extras = FragmentNavigatorExtras(
             imageView to position.toString()
         )
         findNavController().navigate(
             MovieDescriptionFragmentDirections.actionMovieDescriptionFragmentToViewerFragment(
-                Constants.POSTER_BASE_URL + cast.profile_path, position.toString()
+                cast.profile_path, position.toString(), false
             ),
             extras
         )

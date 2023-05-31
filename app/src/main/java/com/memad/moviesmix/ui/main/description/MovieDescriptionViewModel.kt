@@ -7,6 +7,7 @@ import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.models.CastResponse
 import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.models.MoviesResponse
+import com.memad.moviesmix.models.VideosResponse
 import com.memad.moviesmix.repos.DescriptionRepo
 import com.memad.moviesmix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,9 @@ class MovieDescriptionViewModel @Inject constructor(
 
     private val _casts = MutableStateFlow<Resource<out CastResponse?>>(Resource.Loading())
     val cast = _casts.asStateFlow()
+
+    private val _videos = MutableStateFlow<Resource<out VideosResponse?>>(Resource.Loading())
+    val videos = _videos.asStateFlow()
 
 
     private val _isFavourite = MutableStateFlow(false)
@@ -79,6 +83,14 @@ class MovieDescriptionViewModel @Inject constructor(
         viewModelScope.launch {
             descriptionRepo.getCasts(movieId).collect {
                 _casts.emit(it)
+            }
+        }
+    }
+
+    fun getVideo(movieId: String) {
+        viewModelScope.launch {
+            descriptionRepo.getVideos(movieId).collect {
+                _videos.emit(it)
             }
         }
     }
