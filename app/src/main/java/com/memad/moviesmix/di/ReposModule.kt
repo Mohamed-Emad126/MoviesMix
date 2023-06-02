@@ -3,6 +3,7 @@ package com.memad.moviesmix.di
 import com.memad.moviesmix.data.local.MoviesDao
 import com.memad.moviesmix.data.remote.MoviesClient
 import com.memad.moviesmix.di.annotations.*
+import com.memad.moviesmix.repos.FavouritesRepo
 import com.memad.moviesmix.repos.FavouritesRepoImplementation
 import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.repos.MainRepoImpl
@@ -45,5 +46,14 @@ class ReposModule {
         moviesClient: MoviesClient
     ): MainRepo {
         return MainRepoImpl(moviesDao, moviesClient, Constants.UPCOMING)
+    }
+
+    @FavouritesRepoAnn
+    @Singleton
+    @Provides
+    fun provideFavouritesRepo(
+        moviesDao: MoviesDao
+    ): FavouritesRepo {
+        return FavouritesRepoImplementation(moviesDao)
     }
 }

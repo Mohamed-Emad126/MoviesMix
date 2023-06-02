@@ -53,4 +53,5 @@
     <string name="download">تحميل</string>
     <string name="video_not_available">لا توجد فيديوهات لهذا الفيلم</string>
     <string name="no_movies_found">"لا توجد نتائج لـ %s "</string>
+    <string name="no_favourites_yet">لا توجد مفضلات بعد</string>
 </resources>

@@ -35,15 +35,26 @@
         android:id="@+id/favouritesFragment"
         android:name="com.memad.moviesmix.ui.main.favourites.FavouritesFragment"
         android:label="fragment_favourites"
-        tools:layout="@layout/fragment_favourites" />
+        tools:layout="@layout/fragment_favourites">
+        <action
+            android:id="@+id/action_favouritesFragment_to_movieDescriptionFragment"
+            app:destination="@id/movieDescriptionFragment">
+            <argument
+                android:name="movie"
+                app:argType="string" />
+            <argument
+                android:name="movieId"
+                app:argType="string" />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.memad.moviesmix.ui.main.search.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment_to_movieDescriptionFragment"
-            app:destination="@id/movieDescriptionFragment" >
+            app:destination="@id/movieDescriptionFragment">
             <argument
                 android:name="movie"
                 app:argType="string" />
@@ -54,8 +65,7 @@
     </fragment>
     <action
         android:id="@+id/action_global_searchFragment"
-        app:destination="@id/searchFragment" >
-    </action>
+        app:destination="@id/searchFragment"/>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.memad.moviesmix.ui.main.settings.SettingsFragment"
@@ -63,8 +73,7 @@
         tools:layout="@layout/fragment_settings" />
     <action
         android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment" >
-    </action>
+        app:destination="@id/settingsFragment"/>
     <fragment
         android:id="@+id/movieDescriptionFragment"
         android:name="com.memad.moviesmix.ui.main.description.MovieDescriptionFragment"
