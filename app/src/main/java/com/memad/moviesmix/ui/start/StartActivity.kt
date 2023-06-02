@@ -36,7 +36,7 @@ class StartActivity : AppCompatActivity() {
         applyCurrentTheme()
         if (sessionKey.isNotEmpty()) {
             startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            this.finish()
         }
         //setTheme(R.style.Theme_MoviesMix)
         binding = ActivityStartBinding.inflate(layoutInflater)

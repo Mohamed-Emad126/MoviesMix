@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.os.Build
 import android.os.LocaleList
 import androidx.core.os.ConfigurationCompat
 import java.util.*
@@ -21,24 +20,25 @@ fun Context.recreateTask() {
         }
 }
 
-class LocaleUtil  {
+class LocaleUtil {
     companion object {
         val supportedLocales = listOf("en", "ar")
         const val OPTION_PHONE_LANGUAGE = "sys"
 
-        fun getLocaleFromPrefCode(prefCode: String): Locale{
-            val localeCode = if(prefCode != OPTION_PHONE_LANGUAGE) {
+        fun getLocaleFromPrefCode(prefCode: String): Locale {
+            val localeCode = if (prefCode != OPTION_PHONE_LANGUAGE) {
                 prefCode
             } else {
                 val systemLang =
-                    ConfigurationCompat.getLocales(Resources.getSystem().configuration).get(0)?.language
-                if(systemLang in supportedLocales){
+                    ConfigurationCompat.getLocales(Resources.getSystem().configuration)
+                        .get(0)?.language
+                if (systemLang in supportedLocales) {
                     systemLang
                 } else {
                     "en"
                 }
             }
-            return Locale(localeCode)
+            return localeCode?.let { Locale(it) }!!
         }
 
         fun getLocalizedConfiguration(prefLocaleCode: String): Configuration {
@@ -50,14 +50,10 @@ class LocaleUtil  {
             val config = Configuration()
             return config.apply {
                 config.setLayoutDirection(locale)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    config.setLocale(locale)
-                    val localeList = LocaleList(locale)
-                    LocaleList.setDefault(localeList)
-                    config.setLocales(localeList)
-                } else {
-                    config.setLocale(locale)
-                }
+                config.setLocale(locale)
+                val localeList = LocaleList(locale)
+                LocaleList.setDefault(localeList)
+                config.setLocales(localeList)
             }
         }
 
@@ -80,17 +76,12 @@ class LocaleUtil  {
             Locale.setDefault(currentLocale)
             if (!baseLocale.toString().equals(currentLocale.toString(), ignoreCase = true)) {
                 val config = getLocalizedConfiguration(currentLocale)
-                baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
+                baseContext.createConfigurationContext(config)
             }
         }
 
-        @Suppress("DEPRECATION")
         private fun getLocaleFromConfiguration(configuration: Configuration): Locale {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                configuration.locales.get(0)
-            } else {
-                configuration.locale
-            }
+            return configuration.locales.get(0)
         }
 
         fun getLocalizedResources(resources: Resources, prefLocaleCode: String): Resources {
@@ -108,7 +99,8 @@ class LocaleUtil  {
 }
 
 class Storage(context: Context) {
-    private var preferences: SharedPreferences = context.getSharedPreferences("sp", Context.MODE_PRIVATE)
+    private var preferences: SharedPreferences =
+        context.getSharedPreferences("sp", Context.MODE_PRIVATE)
 
     fun getPreferredLocale(): String {
         return preferences.getString("preferred_locale", LocaleUtil.OPTION_PHONE_LANGUAGE)!!
