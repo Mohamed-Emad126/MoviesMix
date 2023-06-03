@@ -32,6 +32,8 @@ class FavouritesFragment : Fragment(), FavouritesAdapter.OnFavouriteEntityClickL
     @Inject
     lateinit var favouritesAdapter: FavouritesAdapter
 
+    private var lastDeleted = -1
+
     private val favouritesViewModel by viewModels<FavouritesViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,12 +68,23 @@ class FavouritesFragment : Fragment(), FavouritesAdapter.OnFavouriteEntityClickL
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            favouritesViewModel.deleteStatusFlow.collectLatest {
+                if (it && lastDeleted != -1) {
+                    favouritesAdapter.notifyItemRemoved(lastDeleted)
+                }
+            }
+        }
     }
 
     private fun initAdapter() {
         binding.favouritesRecycler.adapter = favouritesAdapter
         binding.favouritesRecycler.setHasFixedSize(true)
         favouritesAdapter.favouriteClickListener = this
+        binding.favouritesRecycler.setSwipeToDelete {
+            lastDeleted = it
+            favouritesViewModel.removeFromFavourites(favouritesAdapter.currentList[it].movieId!!)
+        }
     }
 
 

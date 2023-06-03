@@ -3,6 +3,7 @@ package com.memad.moviesmix.repos
 import com.memad.moviesmix.data.local.FavouritesEntity
 import com.memad.moviesmix.data.local.MoviesDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -15,14 +16,14 @@ open class FavouritesRepoImplementation @Inject constructor(
 
     override suspend fun favouriteAMovie(movie: FavouritesEntity): Long {
         Mutex().withLock {
-             return moviesDao.insertFavouriteMovie(movie)
+            return moviesDao.insertFavouriteMovie(movie)
         }
     }
 
-    override suspend fun unFavouriteAMovie(movieId: Int) {
+    override suspend fun unFavouriteAMovie(movieId: Int) = flow<Int> {
         moviesDao.deleteFavouriteMovie(movieId)
-        getFavouritesMovies()
     }
+
 
     override suspend fun checkIsFavourite(movieId: Int): Boolean {
         return moviesDao.checkIsFavourite(movieId)
@@ -34,3 +35,4 @@ open class FavouritesRepoImplementation @Inject constructor(
         }
     }
 }
+
