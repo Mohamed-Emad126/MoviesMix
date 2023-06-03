@@ -9,7 +9,7 @@ interface MainRepo : FavouritesRepo {
 
     override suspend fun favouriteAMovie(movie: FavouritesEntity): Long
 
-    override suspend fun unFavouriteAMovie(movieId: Int)
+    override suspend fun unFavouriteAMovie(movieId: Int): Flow<Int>
 
     suspend fun getAllMovies(
         page: Int

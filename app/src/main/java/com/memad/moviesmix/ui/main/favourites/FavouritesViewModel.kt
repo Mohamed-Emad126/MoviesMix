@@ -20,13 +20,19 @@ class FavouritesViewModel @Inject constructor(
         MutableSharedFlow<MutableList<FavouritesEntity>>(replay = 1)
     val favoriteMoviesFlow = favoriteMovies.asSharedFlow()
 
+    private val deleteStatus = MutableSharedFlow<Boolean>(replay = 1)
+    val deleteStatusFlow = deleteStatus.asSharedFlow()
+
     init {
         getFavoriteMovies()
     }
 
     fun removeFromFavourites(movieId: Int) {
         viewModelScope.launch {
-            favouritesRepo.unFavouriteAMovie(movieId)
+            deleteStatus.emit(false)
+            favouritesRepo.unFavouriteAMovie(movieId).collect {
+                deleteStatus.emit(it > 0)
+            }
         }
     }
 
