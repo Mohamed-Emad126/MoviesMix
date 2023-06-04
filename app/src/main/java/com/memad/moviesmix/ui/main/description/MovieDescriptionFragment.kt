@@ -120,7 +120,14 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
             toViewer(movieEntity.movie?.poster_path!!, false)
         }
         binding.detailsBannerImage.setOnClickListener {
-            toViewer(movieEntity.movie?.backdrop_path!!, false)
+            val extras = FragmentNavigatorExtras(
+                binding.detailsBannerImage to args.movieId
+            )
+            val action =
+                MovieDescriptionFragmentDirections.actionMovieDescriptionFragmentToViewerFragment(
+                    movieEntity.movie?.backdrop_path!!, args.movieId, false
+                )
+            findNavController().navigate(action, extras)
         }
 
         binding.buttonBack.setOnClickListener {

@@ -1,53 +1,56 @@
 package com.memad.moviesmix.ui.main.upcoming
 
+import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.Toast
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.flaviofaria.kenburnsview.KenBurnsView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentUpcomingBinding
-import com.memad.moviesmix.ui.main.trending.LoadingAdapter
 import com.memad.moviesmix.utils.NetworkStatus
 import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.getSnapPosition
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListener,
+class UpcomingFragment : Fragment(),
     UpcomingAdapter.OnMoviesClickListener {
+    private var lastSize: Int = 0
     private var error: String = ""
     private var _binding: FragmentUpcomingBinding? = null
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var upcomingLoadingAdapter: UpcomingLoadingAdapter
-
-    @Inject
     lateinit var upcomingAdapter: UpcomingAdapter
     private lateinit var snapHelper: LinearSnapHelper
-    private lateinit var concatAdapter: ConcatAdapter
 
     @Inject
     lateinit var networkStatusHelper: NetworkStatusHelper
-    private lateinit var layoutManager: CenterZoomLayoutManager
 
     private val upcomingViewModel by viewModels<UpcomingViewModel>()
 
@@ -57,6 +60,11 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
 
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
+
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            drawingViewId = R.id.main_nav_host_fragment
+            scrimColor = Color.TRANSPARENT
+        }
     }
 
     override fun onCreateView(
@@ -70,12 +78,9 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
     }
 
     private fun setupRecyclerView() {
-        layoutManager =
-            CenterZoomLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, true)
-        binding.upcomingRecyclerView.layoutManager = layoutManager
-        concatAdapter = ConcatAdapter(upcomingAdapter, upcomingLoadingAdapter)
-        upcomingAdapter.popularMovieClickListener = this
-        upcomingLoadingAdapter.errorClickListener = this
+
+        binding.upcomingRecyclerView.layoutManager =
+            CenterZoomLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         snapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.upcomingRecyclerView)
         binding.upcomingRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -86,15 +91,25 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
                 }
             }
         })
+        binding.upcomingRecyclerView.adapter = upcomingAdapter
+        upcomingAdapter.upcomingMovieClickListener = this
     }
 
     private fun snapPositionChange(snapPosition: Int) {
-        if (snapPosition == upcomingAdapter.upcomingMoviesList.size - 1) {
-            upcomingViewModel.loadNextPage()
-        } else {
-            binding.releaseDate.text =
-                upcomingAdapter.upcomingMoviesList[snapPosition].movie?.release_date
+        if (upcomingAdapter.currentList.size == 0) {
+            return
         }
+        if (upcomingAdapter.currentList[snapPosition].moviePage == -122) {
+            upcomingViewModel.loadNextPage()
+            loading()
+            return
+        }
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+        val date =
+            inputFormat.parse(upcomingAdapter.currentList[snapPosition].movie?.release_date!!)
+        val formattedDate = outputFormat.format(date!!)
+        "🍿 $formattedDate".also { binding.releaseDate.text = it }
     }
 
     private fun setupObservers() {
@@ -103,36 +118,52 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
                 is NetworkStatus.Unavailable -> {
                     Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
                 }
+
                 else -> {}
             }
         }
-        lifecycleScope.launch {
-            upcomingViewModel.moviesResource.collect {
-                withContext(Dispatchers.Main) {
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                upcomingViewModel.moviesResource.collect {
                     when (it) {
                         is Resource.Loading -> loading()
-                        is Resource.Error -> error(it.data!!)
+                        is Resource.Error -> error(list = it.data!!)
                         is Resource.Success -> {}
                     }
                 }
             }
         }
-        lifecycleScope.launch {
-            upcomingViewModel.moviesList.collectLatest {
-                upcomingAdapter.upcomingMoviesList = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                upcomingViewModel.moviesList.collectLatest {
+                    lastSize = upcomingAdapter.currentList.size
+                    upcomingAdapter.submitList(it)
+                    if (upcomingAdapter.currentList.size > 20) {
+                        snapPositionChange(upcomingAdapter.currentList.size - 21)
+                    } else {
+                        snapPositionChange(0)
+                    }
+                }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                upcomingViewModel.checkFavouritesFlow.collect { booleans ->
+                    upcomingAdapter.submitFavouritesList(booleans)
+                }
+            }
+        }
+
     }
 
 
     private fun loading() {
-        upcomingLoadingAdapter.loading()
         binding.releaseDate.text = getString(R.string.loading)
     }
 
     private fun error(list: List<MovieEntity>) {
         if (list.isEmpty()) {
-            upcomingLoadingAdapter.error()
             binding.releaseDate.text = error
         }
     }
@@ -143,16 +174,57 @@ class UpcomingFragment : Fragment(), LoadingAdapter.OnLoadingAdapterClickListene
         _binding = null
     }
 
-    override fun onMovieErrorStateClicked() {
-        upcomingViewModel.reload()
+
+    override fun onMovieClicked(position: Int, imageView: KenBurnsView) {
+        val extras = FragmentNavigatorExtras(
+            imageView to position.toString()
+        )
+        imageView.pause()
+        val movieResult = upcomingAdapter.currentList[position]
+        findNavController().navigate(
+            UpcomingFragmentDirections.actionUpcomingFragmentToMovieDescriptionFragment(
+                Gson().toJson(movieResult),
+                position.toString()
+            ),
+            extras
+        )
     }
 
-    override fun onMovieClicked(position: Int, imageView: ImageView?) {
-        Toast.makeText(context, "$position Clicked", Toast.LENGTH_SHORT).show()
+    override fun onMovieDoubleClicked(position: Int) {
+        if (upcomingAdapter.favouriteList.isNotEmpty() && !upcomingAdapter.favouriteList[position]) {
+            binding.buttonFavoriteUpcoming.visibility = View.VISIBLE
+            binding.buttonFavoriteUpcoming.isChecked = true
+            binding.buttonFavoriteUpcoming.isActivated = true
+            upcomingViewModel.addToFavourites(upcomingAdapter.currentList[position]!!)
+            binding.buttonFavoriteUpcoming.playAnimation()
+        } else {
+            binding.buttonFavoriteUpcoming.visibility = View.VISIBLE
+            binding.buttonFavoriteUpcoming.isChecked = false
+            binding.buttonFavoriteUpcoming.isActivated = false
+            upcomingViewModel.removeFromFavourites(upcomingAdapter.currentList[position].movieId!!)
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            binding.buttonFavoriteUpcoming.visibility = View.GONE
+        }, 1000)
     }
 
-    override fun onMovieDoubleClicked(position: Int, imageView: ImageView?) {
-        Toast.makeText(context, "$position Double Clicked", Toast.LENGTH_SHORT).show()
+    override fun onResume() {
+        super.onResume()
+        binding.upcomingRecyclerView.layoutManager?.let {
+            snapPositionChange(
+                it.getPosition(
+                    snapHelper.findSnapView(
+                        binding.upcomingRecyclerView.layoutManager
+                    )!!
+                )
+            )
+        }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+    }
 }

@@ -6,8 +6,11 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="12dp"
+    app:veilLayout_defaultChildVisible="false"
     app:veilLayout_radius="6dp"
     app:veilLayout_shimmerEnable="true"
+    android:animateLayoutChanges="true"
+    android:transitionGroup="true"
     app:veilLayout_veiled="true">
 
     <FrameLayout

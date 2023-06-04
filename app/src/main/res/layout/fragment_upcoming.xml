@@ -4,28 +4,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:transitionGroup="true"
+    android:background="?android:attr/colorBackground"
     tools:context=".ui.main.upcoming.UpcomingFragment">
+
+
     <TextView
         android:id="@+id/release_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginBottom="8dp"
         tools:text="On 17 DEC"
-        android:textColor="@color/material_on_surface_emphasis_high_type"
-        android:textSize="28sp"
+        android:textAllCaps="true"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/upcoming_recycler_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/upcoming_recycler_view"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         tools:listitem="@layout/upcoming_item"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/release_date" />
+
+    <com.varunest.sparkbutton.SparkButton
+        android:id="@+id/button_favorite_upcoming"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/heart_inactive"
+        app:layout_constraintBottom_toBottomOf="@+id/upcoming_recycler_view"
+        app:layout_constraintEnd_toEndOf="@id/upcoming_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/upcoming_recycler_view"
+        app:layout_constraintTop_toTopOf="@+id/upcoming_recycler_view"
+        app:sparkbutton_activeImage="@drawable/heart_active"
+        app:sparkbutton_iconSize="50dp"
+        android:visibility="gone"
+        app:sparkbutton_inActiveImage="@drawable/heart_inactive"
+        app:sparkbutton_primaryColor="@color/spark_primary_color"
+        app:sparkbutton_secondaryColor="@color/secondaryColor" />
 </androidx.constraintlayout.widget.ConstraintLayout>

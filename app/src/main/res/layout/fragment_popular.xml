@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:transitionGroup="true"
+    android:background="?android:attr/colorBackground"
     tools:context=".ui.main.popular.PopularFragment">
 
     <com.liaoinstan.springview.widget.SpringView
@@ -15,12 +16,13 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         app:footer="@layout/loading_header"
+        android:background="?android:attr/colorBackground"
         app:header="@layout/loading_header">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/movies_recycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:saveEnabled="true"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"

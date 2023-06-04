@@ -3,10 +3,11 @@ package com.memad.moviesmix.ui.main.popular
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -31,6 +32,7 @@ import com.memad.moviesmix.utils.NetworkStatus
 import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.createDialog
+import com.varunest.sparkbutton.SparkButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -87,7 +89,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
     private fun initRecyclerView() {
         binding.moviesRecycler.isSaveEnabled = true
-        binding.moviesRecycler.setHasFixedSize(true)
+        binding.moviesRecycler.setHasFixedSize(false)
         popularAdapter.popularMovieClickListener = this
         binding.moviesRecycler.adapter = popularAdapter
     }
@@ -129,9 +131,11 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            popularViewModel.moviesList.collectLatest {
-                //popularAdapter.popularMoviesList = it
-                popularAdapter.submitList(it.toMutableList())
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                popularViewModel.moviesList.collectLatest {
+                    //popularAdapter.popularMoviesList = it
+                    popularAdapter.submitList(it.toMutableList())
+                }
             }
         }
 
@@ -206,9 +210,23 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         )
     }
 
-    override fun onMovieDoubleClicked(position: Int, imageView: ImageView?) {
-        popularAdapter.favouriteAnimation(position)
-        popularViewModel.addToFavourites(popularAdapter.currentList[position])
+    override fun onMovieDoubleClicked(position: Int, favouriteButton: SparkButton) {
+        if (popularAdapter.favouritesList.isNotEmpty() && !popularAdapter.favouritesList[position]) {
+            favouriteButton.visibility = View.VISIBLE
+            favouriteButton.isChecked = true
+            favouriteButton.isActivated = true
+            popularViewModel.addToFavourites(popularAdapter.currentList[position]!!)
+            favouriteButton.playAnimation()
+        } else {
+            favouriteButton.visibility = View.VISIBLE
+            favouriteButton.isChecked = false
+            favouriteButton.isActivated = false
+            popularViewModel.removeFromFavourites(popularAdapter.currentList[position].movieId!!)
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            favouriteButton.visibility = View.GONE
+        }, 1000)
     }
 
     override fun onMovieHoldDown(position: Int) {
@@ -234,5 +252,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
     override fun onResume() {
         super.onResume()
         popularViewModel.checkIsFavourites()
+        success()
     }
 }

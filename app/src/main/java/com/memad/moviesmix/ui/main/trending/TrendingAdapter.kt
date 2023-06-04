@@ -2,9 +2,12 @@ package com.memad.moviesmix.ui.main.trending
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.android.material.imageview.ShapeableImageView
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.MovieTrendItemBinding
@@ -12,21 +15,23 @@ import com.memad.moviesmix.utils.Constants
 import javax.inject.Inject
 
 class TrendingAdapter @Inject constructor() :
-    RecyclerView.Adapter<TrendingAdapter.TrendingViewHolder>() {
+    ListAdapter<MovieEntity, TrendingAdapter.TrendingViewHolder>(TrendingDiffCallBack) {
 
     lateinit var trendingMovieClickListener: OnMoviesClickListener
-    var trendingMoviesList: MutableList<MovieEntity> = mutableListOf()
-        set(value) {
-            if (field.isNullOrEmpty()) {
-                field = value
-                notifyDataSetChanged()
-            } else {
-                val lastFinish = field.size
-                field = value
-                notifyItemRangeInserted(lastFinish, 20)
-            }
-        }
 
+    var favouriteList: MutableList<Boolean> = mutableListOf()
+    fun submitFavouritesList(it: MutableList<Boolean>) {
+        favouriteList = it
+    }
+
+    override fun submitList(list: MutableList<MovieEntity>?) {
+        list?.remove(MovieEntity(null, Constants.TRENDING, -122, null))
+        val oldSize = currentList.size
+        list?.add(MovieEntity(null, Constants.TRENDING, -122, null))
+        super.submitList(list)
+        notifyItemRemoved(oldSize)
+        notifyItemRangeInserted(oldSize, list?.size!!)
+    }
 
     /////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
@@ -42,48 +47,31 @@ class TrendingAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: TrendingViewHolder, position: Int) {
-        holder.itemBinding.itemVeilLayout.unVeil()
+        if (currentList[position].moviePage == -122) {
+            holder.itemBinding.itemVeilLayout.veil()
+            return
+        } else {
+            holder.itemBinding.itemVeilLayout.unVeil()
+        }
         holder.itemBinding.posterImage
             .load(
                 Constants.POSTER_BASE_URL +
-                        trendingMoviesList[position].movie?.poster_path
+                        currentList[position].movie?.poster_path
             ) {
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)
                 allowHardware(false)
             }
-        /*when (trendingMoviesList[position].movieType) {
-            LOADING_STATUS_ID -> {
-                holder.itemBinding.itemVeilLayout.veil()
-            }
-            ERROR_STATUS_ID -> {
-                holder.itemBinding.itemVeilLayout.unVeil()
-                holder.itemBinding.posterImage.load(R.drawable.ic_robot_broken) {
-                    crossfade(true)
-                }
-            }
-            else -> {
-                holder.itemBinding.itemVeilLayout.unVeil()
-                holder.itemBinding.posterImage
-                    .load(
-                        Constants.POSTER_BASE_URL +
-                                trendingMoviesList[position].movie?.poster_path
-                    ) {
-                        crossfade(true)
-                        placeholder(R.drawable.start_img_min_blur)
-                        error(R.drawable.start_img_min_broken)
-                    }
-            }
-        }*/
+        ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
     }
 
     override fun getItemCount(): Int {
-        return trendingMoviesList.size
+        return currentList.size
     }
 
     override fun getItemId(position: Int): Long {
-        return trendingMoviesList[position].movieId?.toLong()!!
+        return currentList[position].movieId?.toLong()!!
     }
 
     /////////////////////////////////////////////////////////////////
@@ -108,6 +96,16 @@ class TrendingAdapter @Inject constructor() :
 ///////////////////ClickListenerInterface////////////////////////
 /////////////////////////////////////////////////////////////////
     interface OnMoviesClickListener {
-        fun onMovieClicked(position: Int, imageView: ImageView?)
+        fun onMovieClicked(position: Int, imageView: ShapeableImageView)
+    }
+}
+
+object TrendingDiffCallBack : DiffUtil.ItemCallback<MovieEntity>() {
+    override fun areItemsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
+        return newItem == oldItem
+    }
+
+    override fun areContentsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
+        return newItem.movieId == oldItem.movieId
     }
 }

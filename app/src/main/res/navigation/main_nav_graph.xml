@@ -25,12 +25,34 @@
         android:id="@+id/trendingFragment"
         android:name="com.memad.moviesmix.ui.main.trending.TrendingFragment"
         android:label="fragment_trending"
-        tools:layout="@layout/fragment_trending" />
+        tools:layout="@layout/fragment_trending">
+        <action
+            android:id="@+id/action_trendingFragment_to_movieDescriptionFragment"
+            app:destination="@id/movieDescriptionFragment">
+            <argument
+                android:name="movie"
+                app:argType="string" />
+            <argument
+                android:name="movieId"
+                app:argType="string" />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/upcomingFragment"
         android:name="com.memad.moviesmix.ui.main.upcoming.UpcomingFragment"
         android:label="fragment_upcoming"
-        tools:layout="@layout/fragment_upcoming" />
+        tools:layout="@layout/fragment_upcoming" >
+        <action
+            android:id="@+id/action_upcomingFragment_to_movieDescriptionFragment"
+            app:destination="@id/movieDescriptionFragment" >
+            <argument
+                android:name="movie"
+                app:argType="string" />
+            <argument
+                android:name="movieId"
+                app:argType="string" />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/favouritesFragment"
         android:name="com.memad.moviesmix.ui.main.favourites.FavouritesFragment"
@@ -65,7 +87,7 @@
     </fragment>
     <action
         android:id="@+id/action_global_searchFragment"
-        app:destination="@id/searchFragment"/>
+        app:destination="@id/searchFragment" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.memad.moviesmix.ui.main.settings.SettingsFragment"
@@ -73,7 +95,7 @@
         tools:layout="@layout/fragment_settings" />
     <action
         android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment"/>
+        app:destination="@id/settingsFragment" />
     <fragment
         android:id="@+id/movieDescriptionFragment"
         android:name="com.memad.moviesmix.ui.main.description.MovieDescriptionFragment"

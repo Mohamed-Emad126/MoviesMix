@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:transitionGroup="true"
+    android:animateLayoutChanges="true"
     tools:context=".ui.main.trending.TrendingFragment">
 
     <ImageView
         android:id="@+id/backdrop_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:src="@drawable/start_img_min_blur"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,20 +20,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/discrete_scroll_view"
+        android:id="@+id/recycler_trending"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:orientation="horizontal"
+        android:clipToPadding="false"
         android:paddingLeft="50dp"
         android:paddingRight="50dp"
-        android:clipToPadding="false"
+        android:saveEnabled="true"
+        android:orientation="horizontal"
+        tools:listitem="@layout/movie_trend_item"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:saveEnabled="true"
-        tools:listitem="@layout/movie_trend_item" />
+        app:layout_constraintTop_toBottomOf="@id/header_text"
+        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <TextView
         android:id="@+id/header_text"

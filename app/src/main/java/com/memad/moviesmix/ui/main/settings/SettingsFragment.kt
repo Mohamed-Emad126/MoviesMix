@@ -1,25 +1,24 @@
 package com.memad.moviesmix.ui.main.settings
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.memad.moviesmix.R
+import com.memad.moviesmix.data.local.MoviesDao
 import com.memad.moviesmix.databinding.FragmentSettingsBinding
 import com.memad.moviesmix.models.AuthResponse
-import com.memad.moviesmix.ui.main.MainActivity
 import com.memad.moviesmix.ui.start.StartActivity
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Constants.DARK
@@ -27,6 +26,7 @@ import com.memad.moviesmix.utils.Constants.LANG_PREF
 import com.memad.moviesmix.utils.Constants.LIGHT
 import com.memad.moviesmix.utils.SharedPreferencesHelper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,6 +35,9 @@ class SettingsFragment : Fragment() {
     lateinit var gson: Gson
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var dao: MoviesDao
     private val locales = arrayOf("العربية", "English")
 
     @Inject
@@ -70,6 +73,7 @@ class SettingsFragment : Fragment() {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     preferencesHelper.darkMode = LIGHT
                 }
+
                 binding.darkRadioButton.id -> {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     preferencesHelper.darkMode = DARK
@@ -86,8 +90,11 @@ class SettingsFragment : Fragment() {
                 Constants.SESSION,
                 AuthResponse("", "", false)
             )
-            requireActivity().finish()
+            viewLifecycleOwner.lifecycleScope.launch {
+                dao.deleteAll()
+            }
             startActivity(Intent(context, StartActivity::class.java))
+            requireActivity().finish()
         }
         return binding.root
     }
@@ -98,6 +105,7 @@ class SettingsFragment : Fragment() {
             LIGHT -> {
                 binding.lightRadioButton.isChecked = true
             }
+
             DARK -> {
                 binding.darkRadioButton.isChecked = true
 
@@ -142,6 +150,7 @@ class SettingsFragment : Fragment() {
                     preferencesHelper.save(LANG_PREF, 0)
                     requireActivity().recreate()
                 }
+
                 1 -> {
                     val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
                     AppCompatDelegate.setApplicationLocales(appLocale)

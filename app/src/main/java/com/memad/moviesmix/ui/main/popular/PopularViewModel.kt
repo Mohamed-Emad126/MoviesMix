@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +33,7 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
         MutableStateFlow<Resource<out List<MovieEntity>>>(Resource.Loading())
     val moviesResource: StateFlow<Resource<out List<MovieEntity>>> = _moviesResource.asStateFlow()
 
-    private val _moviesList = MutableSharedFlow<MutableSet<MovieEntity>>()
+    private val _moviesList = MutableSharedFlow<MutableSet<MovieEntity>>(replay = 1)
     val moviesList = _moviesList.asSharedFlow()
 
     private val checkFavourites =
@@ -93,6 +95,16 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
                 FavouritesEntity(entity.movie?.id, entity.movie)
             )
             moviesListLiveData.value?.let { checkIsFavourites(it.map { i -> i.movie?.id!! }) }
+        }
+    }
+    fun removeFromFavourites(movieId: Int) {
+        viewModelScope.launch {
+            mainRepoImpl.unFavouriteAMovie(movieId).collectLatest { id ->
+                if (id != -1) {
+                    checkIsFavourites(_moviesList.first().filter { it.moviePage != -122 }
+                        .map { i -> i.movieId!! })
+                }
+            }
         }
     }
 }

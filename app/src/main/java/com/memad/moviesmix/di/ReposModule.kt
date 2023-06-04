@@ -8,6 +8,7 @@ import com.memad.moviesmix.repos.FavouritesRepoImplementation
 import com.memad.moviesmix.repos.MainRepo
 import com.memad.moviesmix.repos.MainRepoImpl
 import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.SharedPreferencesHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,9 +24,10 @@ class ReposModule {
     @Provides
     fun providePopularRepo(
         moviesDao: MoviesDao,
-        moviesClient: MoviesClient
+        moviesClient: MoviesClient,
+        preferencesHelper: SharedPreferencesHelper
     ): MainRepo {
-        return MainRepoImpl(moviesDao, moviesClient, Constants.POPULAR)
+        return MainRepoImpl(moviesDao, moviesClient, Constants.POPULAR, preferencesHelper)
     }
 
     @TrendingRepo
@@ -33,9 +35,10 @@ class ReposModule {
     @Provides
     fun provideTrendingRepo(
         moviesDao: MoviesDao,
-        moviesClient: MoviesClient
+        moviesClient: MoviesClient,
+        preferencesHelper: SharedPreferencesHelper
     ): MainRepo {
-        return MainRepoImpl(moviesDao, moviesClient, Constants.TRENDING)
+        return MainRepoImpl(moviesDao, moviesClient, Constants.TRENDING, preferencesHelper)
     }
 
     @UpcomingRepo
@@ -43,9 +46,10 @@ class ReposModule {
     @Provides
     fun provideUpcomingRepo(
         moviesDao: MoviesDao,
-        moviesClient: MoviesClient
+        moviesClient: MoviesClient,
+        preferencesHelper: SharedPreferencesHelper
     ): MainRepo {
-        return MainRepoImpl(moviesDao, moviesClient, Constants.UPCOMING)
+        return MainRepoImpl(moviesDao, moviesClient, Constants.UPCOMING, preferencesHelper)
     }
 
     @FavouritesRepoAnn

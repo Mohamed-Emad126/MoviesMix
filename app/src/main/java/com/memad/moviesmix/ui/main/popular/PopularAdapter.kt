@@ -1,11 +1,7 @@
 package com.memad.moviesmix.ui.main.popular
 
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,6 +13,7 @@ import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.MoviePopularItemBinding
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.DoubleClickListener
+import com.varunest.sparkbutton.SparkButton
 import javax.inject.Inject
 
 class PopularAdapter @Inject constructor() :
@@ -49,24 +46,11 @@ class PopularAdapter @Inject constructor() :
 
     fun favouriteAnimation(position: Int) {
         notifyItemChanged(position)
-
     }
 
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
         ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
-        if (favouritesList.isNotEmpty() && favouritesList[position]) {
-            holder.itemBinding.buttonFavoritePopular.visibility = View.VISIBLE
-            holder.itemBinding.buttonFavoritePopular.isChecked = true
-            holder.itemBinding.buttonFavoritePopular.isActivated = true
-        } else {
-            holder.itemBinding.buttonFavoritePopular.isChecked = false
-            holder.itemBinding.buttonFavoritePopular.isActivated = false
-        }
-        holder.itemBinding.buttonFavoritePopular.playAnimation()
-        Handler(Looper.getMainLooper()).postDelayed({
-            holder.itemBinding.buttonFavoritePopular.visibility = View.GONE
-        }, 1000)
 
         holder.itemBinding.posterImage
             .load(
@@ -100,7 +84,7 @@ class PopularAdapter @Inject constructor() :
                 override fun onDoubleClick() {
                     popularMovieClickListener.onMovieDoubleClicked(
                         bindingAdapterPosition,
-                        itemBinding.posterImage
+                        itemBinding.buttonFavoritePopular
                     )
                 }
 
@@ -124,7 +108,7 @@ class PopularAdapter @Inject constructor() :
     /////////////////////////////////////////////////////////////////
     interface OnMoviesClickListener {
         fun onMovieClicked(position: Int, imageView: ShapeableImageView)
-        fun onMovieDoubleClicked(position: Int, imageView: ImageView?)
+        fun onMovieDoubleClicked(position: Int, favouriteButton: SparkButton)
         fun onMovieHoldDown(position: Int)
     }
 }

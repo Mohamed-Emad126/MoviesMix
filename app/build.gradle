@@ -138,4 +138,6 @@ dependencies {
     implementation "androidx.media3:media3-ui:$mediaVersion"
     implementation "androidx.media3:media3-exoplayer-dash:$mediaVersion"
     implementation 'com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.2'
+
+    implementation 'com.flaviofaria:kenburnsview:1.0.7'
 }

@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@drawable/start_img_min"
             app:shapeAppearanceOverlay="@style/popularImageShape" />
 
@@ -38,7 +38,6 @@
         android:textSize="12sp"
         android:textAlignment="center"
         android:ellipsize="end"
-        android:textColor="@color/material_dynamic_neutral20"
         android:layout_marginTop="2dp"
         app:layout_constraintTop_toBottomOf="@id/image_card"
         app:layout_constraintStart_toStartOf="@id/image_card"

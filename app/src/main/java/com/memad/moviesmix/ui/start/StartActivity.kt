@@ -34,7 +34,7 @@ class StartActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         applyCurrentTheme()
-        if (sessionKey.isNotEmpty()) {
+        if (sessionKey.trim().isNotEmpty()) {
             startActivity(Intent(this, MainActivity::class.java))
             this.finish()
         }

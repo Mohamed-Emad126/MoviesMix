@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,5 +32,16 @@ interface MoviesDao {
 
     @Query("SELECT * FROM MOVIE_TABLE WHERE movie_type = :type AND movie_page IN(:page)")
     fun getWholeDB(type: Int, page: List<Int>): Flow<List<MovieEntity>>
+
+    @Query("DELETE FROM FAVOURITES_TABLE")
+    suspend fun deleteAllFavouriteMovie()
+
+    @Query("DELETE FROM MOVIE_TABLE")
+    abstract suspend fun deleteAllMovie()
+    @Transaction
+    suspend fun deleteAll(){
+        deleteAllFavouriteMovie()
+        deleteAllMovie()
+    }
 
 }

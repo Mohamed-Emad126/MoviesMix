@@ -7,7 +7,9 @@ import com.memad.moviesmix.models.Movie
 import com.memad.moviesmix.models.MoviesResponse
 import com.memad.moviesmix.models.VideosResponse
 import com.memad.moviesmix.utils.AccessNative
+import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Resource
+import com.memad.moviesmix.utils.SharedPreferencesHelper
 import com.skydoves.sandwich.getOrNull
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.suspendOnError
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 class DescriptionRepo @Inject constructor(
     private val moviesClient: MoviesClient,
-    moviesDao: MoviesDao
+    moviesDao: MoviesDao,
+    private val preferencesHelper: SharedPreferencesHelper
 ) : FavouritesRepoImplementation(moviesDao) {
 
     suspend fun getMovie(movieId: String) = flow<Movie> {
@@ -26,7 +29,10 @@ class DescriptionRepo @Inject constructor(
     }
 
     suspend fun getSimilarMovies(movieId: String) = flow<Resource<MoviesResponse?>> {
-        val response = moviesClient.getSimilarMovies(movieId, AccessNative.getApiKey())
+        val response = moviesClient.getSimilarMovies(
+            movieId, AccessNative.getApiKey(),
+            language = if(preferencesHelper.read(Constants.LANG_PREF, "en-US") == "0") "ar-EG" else "en-US"
+        )
         response.suspendOnSuccess {
             emit(Resource.Success(response.getOrNull()))
         }
@@ -39,7 +45,11 @@ class DescriptionRepo @Inject constructor(
     }
 
     suspend fun getCasts(movieId: String) = flow<Resource<CastResponse?>> {
-        val response = moviesClient.getCastOfMovie(movieId, AccessNative.getApiKey())
+        val response = moviesClient.getCastOfMovie(
+            movieId,
+            AccessNative.getApiKey(),
+            language = if(preferencesHelper.read(Constants.LANG_PREF, "en-US") == "0") "ar-EG" else "en-US"
+        )
         response.suspendOnSuccess {
             emit(Resource.Success(response.getOrNull()))
         }
@@ -52,7 +62,8 @@ class DescriptionRepo @Inject constructor(
     }
 
     fun getVideos(toString: String) = flow<Resource<VideosResponse?>> {
-        val response = moviesClient.getVideosOfMovie(toString, AccessNative.getApiKey())
+        val response = moviesClient.getVideosOfMovie(toString, AccessNative.getApiKey(),
+            language = if(preferencesHelper.read(Constants.LANG_PREF, "en-US") == "0") "ar-EG" else "en-US")
         response.suspendOnSuccess {
             emit(Resource.Success(response.getOrNull()))
         }
