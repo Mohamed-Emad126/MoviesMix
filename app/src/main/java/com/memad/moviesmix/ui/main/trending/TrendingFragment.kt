@@ -9,6 +9,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.gson.Gson
@@ -33,7 +33,6 @@ import com.memad.moviesmix.databinding.FragmentTrendingBinding
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.GenresUtils
 import com.memad.moviesmix.utils.NetworkStatus
-import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.getSnapPosition
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,13 +46,9 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
 
     private lateinit var snapHelper: LinearSnapHelper
 
+
     @Volatile
-    private var lastSize: Int = 0
-
     private var error: String = ""
-
-    @Inject
-    lateinit var networkStatusHelper: NetworkStatusHelper
 
     @Inject
     lateinit var trendingAdapter: TrendingAdapter
@@ -165,15 +160,9 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
 
 
     private fun setupObservables() {
-        networkStatusHelper.observe(viewLifecycleOwner) {
-            when (it) {
-                is NetworkStatus.Unavailable -> {
-                    Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
-                }
 
-                else -> {}
-            }
-        }
+        networkCheck()
+
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -189,14 +178,8 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 trendingViewModel.moviesList.collectLatest {
-                    lastSize = trendingAdapter.currentList.size
                     trendingAdapter.submitList(it)
                     success()
-                    if (trendingAdapter.currentList.size > 20) {
-                        handleDetailsUi(trendingAdapter.currentList.size - 21)
-                    } else {
-                        handleDetailsUi(0)
-                    }
                 }
             }
         }
@@ -204,6 +187,23 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 trendingViewModel.checkFavouritesFlow.collect { booleans ->
                     trendingAdapter.submitFavouritesList(booleans)
+                }
+            }
+        }
+    }
+
+    private fun networkCheck() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                trendingViewModel.networkStatus.collectLatest {
+                    when (it) {
+                        is NetworkStatus.Disconnected -> {
+                            error = getString(R.string.no_network)
+                            Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
+                        }
+
+                        else -> {}
+                    }
                 }
             }
         }
@@ -219,6 +219,9 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
             binding.backdropImage.load(R.drawable.start_img_min_blur) { allowHardware(false) }
             binding.progressPercent.text = ""
             binding.progressBar.progress = 0
+        } else {
+            success()
+            networkCheck()
         }
     }
 
@@ -305,20 +308,22 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
     }
 
     fun snapPositionChange(position: Int) {
-        handleDetailsUi(position)
         success()
+        handleDetailsUi(position)
     }
 
     override fun onResume() {
         super.onResume()
-        binding.recyclerTrending.layoutManager?.let {
-            handleDetailsUi(
-                it.getPosition(
-                    snapHelper.findSnapView(
-                        binding.recyclerTrending.layoutManager
-                    )!!
+        if (binding.recyclerTrending.layoutManager != null && snapHelper.findSnapView(binding.recyclerTrending.layoutManager) != null) {
+            binding.recyclerTrending.layoutManager?.let {
+                snapPositionChange(
+                    it.getPosition(
+                        snapHelper.findSnapView(
+                            binding.recyclerTrending.layoutManager
+                        )!!
+                    )
                 )
-            )
+            }
         }
     }
 

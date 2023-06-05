@@ -7,22 +7,34 @@ import com.memad.moviesmix.data.local.FavouritesEntity
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.di.annotations.PopularRepo
 import com.memad.moviesmix.repos.MainRepo
+import com.memad.moviesmix.utils.NetworkStatus
+import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl: MainRepo) :
+class PopularViewModel @Inject constructor(
+    @PopularRepo private val mainRepoImpl: MainRepo,
+    networkStatusHelper: NetworkStatusHelper
+) :
     ViewModel() {
 
+    val networkStatus: StateFlow<NetworkStatus> = networkStatusHelper.networkStatus.stateIn(
+        initialValue = NetworkStatus.Unknown,
+        scope = viewModelScope,
+        started = WhileSubscribed(5000)
+    )
     private val currentPage = MutableLiveData(1)
     val moviesListLiveData = MutableLiveData<MutableSet<MovieEntity>>(mutableSetOf())
 
@@ -97,6 +109,7 @@ class PopularViewModel @Inject constructor(@PopularRepo private val mainRepoImpl
             moviesListLiveData.value?.let { checkIsFavourites(it.map { i -> i.movie?.id!! }) }
         }
     }
+
     fun removeFromFavourites(movieId: Int) {
         viewModelScope.launch {
             mainRepoImpl.unFavouriteAMovie(movieId).collectLatest { id ->

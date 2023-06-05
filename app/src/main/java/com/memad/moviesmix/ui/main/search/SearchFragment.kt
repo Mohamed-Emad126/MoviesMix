@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,6 +24,7 @@ import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentSearchBinding
 import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.NetworkStatus
 import com.memad.moviesmix.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -77,6 +77,25 @@ class SearchFragment : Fragment(),
     private fun initVisibility() {
         binding.springView.visibility = View.GONE
     }
+
+    private fun networkCheck() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                searchViewModel.networkStatus.collectLatest {
+                    when (it) {
+                        is NetworkStatus.Connected -> {
+                        }
+
+                        else -> {
+                            binding.emptyLayout.emptyText.text =
+                                getString(R.string.no_network)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @SuppressLint("RestrictedApi")
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -94,7 +113,7 @@ class SearchFragment : Fragment(),
                             if (it.data?.results?.isEmpty() == true) {
                                 binding.emptyLayout.emptyLayout.visibility = View.VISIBLE
                                 binding.emptyLayout.emptyText.text =
-                                    getString(R.string.no_movies_found, query)
+                                    String.format(getString(R.string.no_movies_found), query)
                                 binding.springView.visibility = View.GONE
                             } else {
                                 binding.emptyLayout.emptyLayout.visibility = View.GONE
@@ -106,11 +125,7 @@ class SearchFragment : Fragment(),
                             binding.springView.visibility = View.GONE
                             binding.emptyLayout.emptyLayout.visibility = View.VISIBLE
                             binding.loadingLayout.loadingLayout.visibility = View.GONE
-                            Toast.makeText(
-                                requireContext(),
-                                it.errorMessage,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            networkCheck()
                         }
                     }
                     binding.springView.onFinishFreshAndLoad()
@@ -183,7 +198,6 @@ class SearchFragment : Fragment(),
     }
 
     override fun onMovieFavouriteClicked(position: Int, isActivated: Boolean) {
-        Toast.makeText(requireContext(), isActivated.toString(), Toast.LENGTH_SHORT).show()
         if (isActivated) {
             searchViewModel.addToFavourites(
                 MovieEntity(

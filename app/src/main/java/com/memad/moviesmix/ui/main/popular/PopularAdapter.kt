@@ -44,10 +44,6 @@ class PopularAdapter @Inject constructor() :
         )
     }
 
-    fun favouriteAnimation(position: Int) {
-        notifyItemChanged(position)
-    }
-
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
         ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
