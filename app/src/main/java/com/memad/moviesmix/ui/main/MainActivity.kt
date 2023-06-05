@@ -10,7 +10,11 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDirections
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ActivityMainBinding
@@ -68,6 +72,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                         SearchFragmentDirections.actionGlobalSearchFragment()
                     )
                 }
+
                 R.id.setting_item -> {
                     navigateTo(
                         MaterialSharedAxis.X,
@@ -90,9 +95,11 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 DARK -> {
                     AppCompatDelegate.MODE_NIGHT_YES
                 }
+
                 LIGHT -> {
                     AppCompatDelegate.MODE_NIGHT_NO
                 }
+
                 else -> {
                     AppCompatDelegate.MODE_NIGHT_NO
                 }

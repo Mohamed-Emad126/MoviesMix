@@ -5,75 +5,60 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.util.Log
-import androidx.lifecycle.LiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.net.InetSocketAddress
-import java.net.Socket
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
-import javax.inject.Singleton
 
-sealed class NetworkStatus {
-    object Available : NetworkStatus()
-    object Unavailable : NetworkStatus()
+interface NetworkConnectivityService {
+    val networkStatus: Flow<NetworkStatus>
 }
 
-@Singleton
-class NetworkStatusHelper @Inject constructor(@ApplicationContext context: Context) :
-    LiveData<NetworkStatus>() {
+sealed class NetworkStatus {
+    object Unknown : NetworkStatus()
+    object Connected : NetworkStatus()
+    object Disconnected : NetworkStatus()
+}
 
-    private var connectivityManager: ConnectivityManager =
+class NetworkStatusHelper @Inject constructor(
+    @ApplicationContext private val context: Context
+) : NetworkConnectivityService {
+
+    private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    private lateinit var connectivityManagerCallback: ConnectivityManager.NetworkCallback
 
-
-    private fun getConnectivityManagerCallback() =
-        object : ConnectivityManager.NetworkCallback() {
-
+    override val networkStatus: Flow<NetworkStatus> = callbackFlow {
+        val connectivityCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                super.onAvailable(network)
-                postValue(NetworkStatus.Available)
+                trySend(NetworkStatus.Connected)
+            }
+
+            override fun onUnavailable() {
+                trySend(NetworkStatus.Disconnected)
             }
 
             override fun onLost(network: Network) {
-                super.onLost(network)
-                postValue(NetworkStatus.Unavailable)
-            }
-
-            override fun onCapabilitiesChanged(
-                network: Network,
-                networkCapabilities: NetworkCapabilities
-            ) {
-                val isInternet =
-                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                val isValidated =
-                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                postValue(
-                    if (isInternet && isValidated) NetworkStatus.Available else NetworkStatus.Unavailable
-                )
+                trySend(NetworkStatus.Disconnected)
             }
 
         }
 
-
-    override fun onActive() {
-        super.onActive()
-        connectivityManagerCallback = getConnectivityManagerCallback()
-        val networkRequest = NetworkRequest
-            .Builder()
+        val request = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
             .build()
-        connectivityManager.registerNetworkCallback(networkRequest, connectivityManagerCallback)
-    }
 
-    override fun onInactive() {
-        super.onInactive()
-        connectivityManager.unregisterNetworkCallback(connectivityManagerCallback)
-    }
+        connectivityManager.registerNetworkCallback(request, connectivityCallback)
 
+        awaitClose {
+            connectivityManager.unregisterNetworkCallback(connectivityCallback)
+        }
+    }
+        .distinctUntilChanged()
+        .flowOn(Dispatchers.IO)
 }
-

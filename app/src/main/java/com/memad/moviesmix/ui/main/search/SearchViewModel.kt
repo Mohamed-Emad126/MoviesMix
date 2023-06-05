@@ -7,23 +7,34 @@ import com.memad.moviesmix.data.local.FavouritesEntity
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.models.MoviesResponse
 import com.memad.moviesmix.repos.SearchRepo
+import com.memad.moviesmix.utils.NetworkStatus
+import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchRepo: SearchRepo
+    private val searchRepo: SearchRepo,
+    networkStatusHelper: NetworkStatusHelper
 ) : ViewModel() {
     private val _searchStatus = MutableStateFlow<Resource<out MoviesResponse?>>(Resource.Loading())
     val searchStatus = _searchStatus.asStateFlow()
 
+    val networkStatus: StateFlow<NetworkStatus> = networkStatusHelper.networkStatus.stateIn(
+        initialValue = NetworkStatus.Unknown,
+        scope = viewModelScope,
+        started = WhileSubscribed(5000)
+    )
     private val searchResult =
         MutableSharedFlow<MutableList<MoviesResponse.Result>>(replay = 1)
     val searchResultFlow = searchResult.asSharedFlow()
@@ -61,8 +72,9 @@ class SearchViewModel @Inject constructor(
                             it.data?.results!!.toMutableList()
                         ).flatten().toMutableList()
                     )
-                    checkIsFavourites(it.data.results.map { i -> i.id })
+                    checkIsFavourites(searchResult.first().map { i -> i.id })
                 }
+                checkIsFavourites(searchResult.first().map { i -> i.id })
             }
         }
     }

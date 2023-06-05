@@ -4,9 +4,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,15 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.flaviofaria.kenburnsview.KenBurnsView
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.gson.Gson
 import com.memad.moviesmix.R
-import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentUpcomingBinding
 import com.memad.moviesmix.utils.NetworkStatus
-import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.getSnapPosition
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +39,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class UpcomingFragment : Fragment(),
     UpcomingAdapter.OnMoviesClickListener {
+    @Volatile
     private var lastSize: Int = 0
     private var error: String = ""
     private var _binding: FragmentUpcomingBinding? = null
@@ -49,8 +49,6 @@ class UpcomingFragment : Fragment(),
     lateinit var upcomingAdapter: UpcomingAdapter
     private lateinit var snapHelper: LinearSnapHelper
 
-    @Inject
-    lateinit var networkStatusHelper: NetworkStatusHelper
 
     private val upcomingViewModel by viewModels<UpcomingViewModel>()
 
@@ -96,6 +94,7 @@ class UpcomingFragment : Fragment(),
     }
 
     private fun snapPositionChange(snapPosition: Int) {
+        Log.d("snapPositionChange", snapPosition.toString())
         if (upcomingAdapter.currentList.size == 0) {
             return
         }
@@ -112,25 +111,32 @@ class UpcomingFragment : Fragment(),
         "🍿 $formattedDate".also { binding.releaseDate.text = it }
     }
 
-    private fun setupObservers() {
-        networkStatusHelper.observe(viewLifecycleOwner) {
-            when (it) {
-                is NetworkStatus.Unavailable -> {
-                    Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
-                }
+    private fun networkCheck() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                upcomingViewModel.networkStatus.collectLatest {
+                    when (it) {
+                        is NetworkStatus.Disconnected -> {
+                            error = getString(R.string.no_network)
+                            Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
+                        }
 
-                else -> {}
+                        else -> {}
+                    }
+                }
             }
         }
+    }
 
+    private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 upcomingViewModel.moviesResource.collect {
                     when (it) {
                         is Resource.Loading -> loading()
-                        is Resource.Error -> error(list = it.data!!)
-                        is Resource.Success -> {}
+                        else -> {}
                     }
+                    networkCheck()
                 }
             }
         }
@@ -160,12 +166,6 @@ class UpcomingFragment : Fragment(),
 
     private fun loading() {
         binding.releaseDate.text = getString(R.string.loading)
-    }
-
-    private fun error(list: List<MovieEntity>) {
-        if (list.isEmpty()) {
-            binding.releaseDate.text = error
-        }
     }
 
 
@@ -209,18 +209,6 @@ class UpcomingFragment : Fragment(),
         }, 1000)
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.upcomingRecyclerView.layoutManager?.let {
-            snapPositionChange(
-                it.getPosition(
-                    snapHelper.findSnapView(
-                        binding.upcomingRecyclerView.layoutManager
-                    )!!
-                )
-            )
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

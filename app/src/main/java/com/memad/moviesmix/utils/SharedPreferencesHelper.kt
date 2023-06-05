@@ -24,6 +24,13 @@ class SharedPreferencesHelper @Inject constructor(
         }
     }
 
+    fun remove(key: String) {
+        with(sharedPref.edit().remove(key)) {
+            apply()
+            commit()
+        }
+    }
+
     fun read(key: String, defaultValue: String): String? {
         return sharedPref.getString(key, defaultValue)
     }

@@ -119,6 +119,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
         binding.posterImage.setOnClickListener {
             toViewer(movieEntity.movie?.poster_path!!, false)
         }
+        binding.detailsBannerImage.transitionName = args.movieId
         binding.detailsBannerImage.setOnClickListener {
             val extras = FragmentNavigatorExtras(
                 binding.detailsBannerImage to args.movieId
@@ -142,7 +143,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
                 binding.buttonFavorite.playAnimation()
             } else {
                 binding.buttonFavorite.isChecked = false
-                movieEntity.movie?.let { it1 -> movieDescriptionViewModel.removeFromFavourites(it1.id) }
+                movieEntity.movieId?.let { it1 -> movieDescriptionViewModel.removeFromFavourites(it1) }
             }
         }
 

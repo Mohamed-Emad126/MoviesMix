@@ -46,7 +46,7 @@ class UtilsModule {
             Constants.SESSION,
             gson.toJson(AuthResponse("", "", false))
         )
-        return gson.fromJson(session, AuthResponse::class.java).guest_session_id
+        return gson.fromJson(session, AuthResponse::class.java).guest_session_id.trim()
     }
 
     @Singleton

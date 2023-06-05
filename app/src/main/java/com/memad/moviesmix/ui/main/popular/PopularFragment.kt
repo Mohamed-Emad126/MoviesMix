@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,7 +19,6 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.gson.Gson
@@ -29,7 +29,6 @@ import com.memad.moviesmix.databinding.FragmentPopularBinding
 import com.memad.moviesmix.databinding.PosterDialogBinding
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.NetworkStatus
-import com.memad.moviesmix.utils.NetworkStatusHelper
 import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.createDialog
 import com.varunest.sparkbutton.SparkButton
@@ -42,8 +41,6 @@ import javax.inject.Inject
 class PopularFragment : Fragment(), SpringView.OnFreshListener,
     PopularAdapter.OnMoviesClickListener {
 
-    @Inject
-    lateinit var networkStatusHelper: NetworkStatusHelper
 
     @Inject
     lateinit var popularAdapter: PopularAdapter
@@ -94,17 +91,29 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         binding.moviesRecycler.adapter = popularAdapter
     }
 
-    private fun setupObservables() {
-        networkStatusHelper.observe(viewLifecycleOwner) {
-            when (it) {
-                is NetworkStatus.Unavailable -> {
-                    Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
-                }
+    private fun networkCheck() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                popularViewModel.networkStatus.collectLatest {
+                    when (it) {
+                        is NetworkStatus.Disconnected -> {
+                            error = getString(R.string.no_network)
+                            Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
+                        }
 
-                else -> {}
+                        is NetworkStatus.Unknown -> {
+                            error = getString(R.string.no_network)
+                            Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
+                        }
+
+                        else -> {}
+                    }
+                }
             }
         }
+    }
 
+    private fun setupObservables() {
         viewLifecycleOwner.lifecycleScope.launch {
             popularViewModel.isFirstLoading.collectLatest {
                 if (it) {
@@ -125,7 +134,13 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
                         }
                     }
 
-                    is Resource.Error -> error(popularViewModel.moviesListLiveData.value?.toMutableList())
+                    is Resource.Error -> {
+                        error(popularViewModel.moviesListLiveData.value?.toMutableList())
+                        if (it.data.isNullOrEmpty()) {
+                            networkCheck()
+                        }
+                    }
+
                     is Resource.Success -> success()
                 }
             }

@@ -52,6 +52,6 @@
     <string name="play_button">play Button</string>
     <string name="download">Download</string>
     <string name="video_not_available">No videos available for this movie!!</string>
-    <string name="no_movies_found">No Results Found of %s</string>
+    <string name="no_movies_found" formatted="true">No Results Found of %1$s</string>
     <string name="no_favourites_yet">No Favourites Yet</string>
 </resources>

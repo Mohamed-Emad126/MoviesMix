@@ -18,13 +18,13 @@ import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MoviesDao
 import com.memad.moviesmix.databinding.FragmentSettingsBinding
-import com.memad.moviesmix.models.AuthResponse
 import com.memad.moviesmix.ui.start.StartActivity
 import com.memad.moviesmix.utils.Constants
 import com.memad.moviesmix.utils.Constants.DARK
 import com.memad.moviesmix.utils.Constants.LANG_PREF
 import com.memad.moviesmix.utils.Constants.LIGHT
 import com.memad.moviesmix.utils.SharedPreferencesHelper
+import com.memad.moviesmix.utils.recreateTask
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,9 +86,8 @@ class SettingsFragment : Fragment() {
             openLanguageSelectorDialog(currentLang)
         }
         binding.removeCache.setOnClickListener {
-            preferencesHelper.save(
+            preferencesHelper.remove(
                 Constants.SESSION,
-                AuthResponse("", "", false)
             )
             viewLifecycleOwner.lifecycleScope.launch {
                 dao.deleteAll()
@@ -155,7 +154,7 @@ class SettingsFragment : Fragment() {
                     val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
                     AppCompatDelegate.setApplicationLocales(appLocale)
                     preferencesHelper.save(LANG_PREF, 1)
-                    requireActivity().recreate()
+                    requireActivity().recreateTask()
                 }
             }
         }

@@ -8,19 +8,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.FragmentStartBinding
 import com.memad.moviesmix.databinding.LoadingDialogBinding
 import com.memad.moviesmix.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class StartFragment : Fragment() {
 
-    @Inject
-    lateinit var networkStatusHelper: NetworkStatusHelper
 
     @Inject
     lateinit var sharedPreferencesHelper: SharedPreferencesHelper
@@ -41,8 +44,12 @@ class StartFragment : Fragment() {
         binding.startedButton.setOnClickListener {
             startViewModel.createSession()
         }
-        networkStatusHelper.observe(viewLifecycleOwner) {
-            networkStatus = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                startViewModel.networkStatus.collectLatest {
+                    networkStatus = it
+                }
+            }
         }
         startViewModel.createSessionStatus.observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -54,10 +61,12 @@ class StartFragment : Fragment() {
                     loadingDialog.dismiss()
                     findNavController().navigate(R.id.action_startFragment_to_onBoardingFragment)
                 }
+
                 is Resource.Error -> {
                     loadingDialog.dismiss()
                     handleErrorState()
                 }
+
                 is Resource.Loading -> {
                     loadingDialog.show()
                 }
@@ -66,10 +75,35 @@ class StartFragment : Fragment() {
         return binding.root
     }
 
+    private fun networkCheck() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                startViewModel.networkStatus.collectLatest {
+                    when (it) {
+                        is NetworkStatus.Connected -> {
+                        }
+
+                        else -> {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.no_network),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun handleErrorState() {
-        if (networkStatus is NetworkStatus.Unavailable) {
-            Toast.makeText(activity, "No network connection!", Toast.LENGTH_SHORT)
-                .show()
+        networkCheck()
+        when (networkStatus) {
+            is NetworkStatus.Connected -> {}
+            else -> {
+                Toast.makeText(activity, "No network connection!", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
