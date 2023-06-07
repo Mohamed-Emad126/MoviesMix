@@ -16,8 +16,8 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.internal.ViewUtils.hideKeyboard
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialSharedAxis
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.gson.Gson
 import com.liaoinstan.springview.widget.SpringView
 import com.memad.moviesmix.R
@@ -184,7 +184,7 @@ class SearchFragment : Fragment(),
 
     override fun onMovieClicked(position: Int, imageView: ShapeableImageView) {
         val extras = FragmentNavigatorExtras(
-            imageView to position.toString()
+            imageView to position.toString() + "poster"
         )
 
         val movieResult = searchAdapter.currentList[position]

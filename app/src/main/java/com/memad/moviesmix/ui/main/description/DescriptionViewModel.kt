@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieDescriptionViewModel @Inject constructor(
+class DescriptionViewModel @Inject constructor(
     private val descriptionRepo: DescriptionRepo
 ) :
     ViewModel() {

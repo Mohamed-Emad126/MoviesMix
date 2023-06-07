@@ -73,7 +73,7 @@ class RecommendAdapter @Inject constructor() :
         init {
             itemBinding.similarMovieItem.setOnClickListener {
                 similarMovieClickListener?.onSimilarMovieClicked(
-                    bindingAdapterPosition,
+                    absoluteAdapterPosition,
                     itemBinding.posterDialogImage
                 )
             }

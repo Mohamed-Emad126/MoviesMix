@@ -7,12 +7,12 @@
     android:animateLayoutChanges="true"
     android:saveEnabled="true"
     android:transitionGroup="true"
-    android:background="?android:attr/colorBackground"
+    android:background="?attr/colorSurface"
     tools:context=".ui.main.description.MovieDescriptionFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:saveEnabled="true">
 
         <ImageView
@@ -31,6 +31,8 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_margin="16dp"
+            android:elevation="8dp"
+            android:backgroundTint="@color/material_on_primary_emphasis_high_type"
             android:contentDescription="@string/banner_image"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_arrow_back"

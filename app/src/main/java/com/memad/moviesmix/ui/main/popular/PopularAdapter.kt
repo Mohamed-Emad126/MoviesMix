@@ -2,7 +2,6 @@ package com.memad.moviesmix.ui.main.popular
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,29 +36,24 @@ class PopularAdapter @Inject constructor() :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PopularViewHolder {
         return PopularViewHolder(
             MoviePopularItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+                LayoutInflater.from(parent.context), parent, false
             )
         )
     }
 
 
     override fun onBindViewHolder(holder: PopularViewHolder, position: Int) {
-        ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
+        holder.itemBinding.posterImage.transitionName = position.toString() + "poster"
 
-        holder.itemBinding.posterImage
-            .load(
-                Constants.POSTER_BASE_URL +
-                        getItem(position).movie?.poster_path
+        holder.itemBinding.posterImage.load(
+                Constants.POSTER_BASE_URL + getItem(position).movie?.poster_path!!
             ) {
                 crossfade(true)
                 placeholder(R.drawable.start_img_min_blur)
                 error(R.drawable.start_img_min_broken)
                 allowHardware(false)
             }
-        holder.itemBinding.movieRate.text =
-            getItem(position).movie?.vote_average.toString()
+        holder.itemBinding.movieRate.text = getItem(position).movie?.vote_average.toString()
     }
 
     override fun getItemCount(): Int {
@@ -79,20 +73,18 @@ class PopularAdapter @Inject constructor() :
             itemBinding.movieCard.setOnClickListener(object : DoubleClickListener() {
                 override fun onDoubleClick() {
                     popularMovieClickListener.onMovieDoubleClicked(
-                        bindingAdapterPosition,
-                        itemBinding.buttonFavoritePopular
+                        absoluteAdapterPosition, itemBinding.buttonFavoritePopular
                     )
                 }
 
                 override fun onSingleClick() {
                     popularMovieClickListener.onMovieClicked(
-                        bindingAdapterPosition,
-                        itemBinding.posterImage
+                        absoluteAdapterPosition, itemBinding.posterImage
                     )
                 }
             })
             itemBinding.movieCard.setOnLongClickListener {
-                popularMovieClickListener.onMovieHoldDown(bindingAdapterPosition)
+                popularMovieClickListener.onMovieHoldDown(absoluteAdapterPosition)
                 true
             }
         }
@@ -115,6 +107,6 @@ object MoviesDiffCallBack : DiffUtil.ItemCallback<MovieEntity>() {
     }
 
     override fun areContentsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
-        return newItem.movie?.id == oldItem.movie?.id
+        return newItem.movieId == oldItem.movieId
     }
 }

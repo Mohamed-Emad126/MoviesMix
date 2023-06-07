@@ -1,7 +1,6 @@
 package com.memad.moviesmix.ui.main.trending
 
 import android.animation.ObjectAnimator
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,8 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.MaterialFadeThrough
 import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
@@ -59,17 +57,8 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
-        sharedElementEnterTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.main_nav_host_fragment
-            scrimColor = Color.TRANSPARENT
-        }
-        sharedElementReturnTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.main_nav_host_fragment
-            scrimColor = Color.TRANSPARENT
-        }
     }
 
     override fun onCreateView(
@@ -219,9 +208,9 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
             binding.backdropImage.load(R.drawable.start_img_min_blur) { allowHardware(false) }
             binding.progressPercent.text = ""
             binding.progressBar.progress = 0
+            networkCheck()
         } else {
             success()
-            networkCheck()
         }
     }
 
@@ -293,8 +282,9 @@ class TrendingFragment : Fragment(), TrendingAdapter.OnMoviesClickListener {
     }
 
     override fun onMovieClicked(position: Int, imageView: ShapeableImageView) {
+
         val extras = FragmentNavigatorExtras(
-            imageView to position.toString()
+            imageView to position.toString() + "poster"
         )
 
         val movieResult = trendingAdapter.currentList[position]

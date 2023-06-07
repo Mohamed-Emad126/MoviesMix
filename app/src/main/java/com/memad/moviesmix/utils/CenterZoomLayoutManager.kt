@@ -1,4 +1,4 @@
-package com.memad.moviesmix.ui.main.upcoming
+package com.memad.moviesmix.utils
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager

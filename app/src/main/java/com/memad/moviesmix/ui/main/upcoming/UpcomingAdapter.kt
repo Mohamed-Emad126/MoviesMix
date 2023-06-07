@@ -54,7 +54,7 @@ class UpcomingAdapter @Inject constructor() :
         } else {
             holder.itemBinding.upcomingLoadingVeilLayout.unVeil()
         }
-        ViewCompat.setTransitionName(holder.itemBinding.movieImage, position.toString())
+        ViewCompat.setTransitionName(holder.itemBinding.movieImage, position.toString() + "poster")
         holder.itemBinding.movieImage
             .load(
                 Constants.POSTER_BASE_URL +

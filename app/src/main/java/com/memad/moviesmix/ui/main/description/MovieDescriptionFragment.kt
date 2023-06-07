@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.transition.MaterialContainerTransform
 import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
@@ -52,7 +51,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
     @Inject
     lateinit var castsAdapter: CastsAdapter
 
-    private val movieDescriptionViewModel by viewModels<MovieDescriptionViewModel>()
+    private val movieDescriptionViewModel by viewModels<DescriptionViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +59,6 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
             drawingViewId = R.id.main_nav_host_fragment
             scrimColor = Color.TRANSPARENT
         }
-
     }
 
     override fun onCreateView(
@@ -70,7 +68,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
         // Inflate the layout for this fragment
         _binding = FragmentMovieDescriptionBinding.inflate(inflater, container, false)
         movieEntity = Gson().fromJson(args.movie, MovieEntity::class.java)
-        ViewCompat.setTransitionName(binding.posterImage, args.movieId)
+        binding.posterImage.transitionName = args.movieId + "poster"
         init()
         initViews()
         initRecommendations()
@@ -101,6 +99,10 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
             placeholder(R.drawable.start_img_min_blur)
             error(R.drawable.start_img_min_broken)
             allowHardware(false)
+        }.job.invokeOnCompletion {
+            binding.posterImage.doOnPreDraw {
+                startPostponedEnterTransition()
+            }
         }
         binding.textMovieTitle.text = movieEntity.movie?.title
         binding.textDescription.text = movieEntity.movie?.overview
@@ -270,7 +272,7 @@ class MovieDescriptionFragment : Fragment(), RecommendAdapter.OnMovieClickListen
                 Gson().toJson(MovieEntity(movieResult.id, RECOMMENDED, 1, movieResult)),
                 position.toString()
             ),
-            extras
+            navigatorExtras = extras
         )
     }
 

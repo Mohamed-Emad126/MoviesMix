@@ -21,11 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.flaviofaria.kenburnsview.KenBurnsView
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialFadeThrough
 import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.FragmentUpcomingBinding
+import com.memad.moviesmix.utils.CenterZoomLayoutManager
 import com.memad.moviesmix.utils.NetworkStatus
 import com.memad.moviesmix.utils.Resource
 import com.memad.moviesmix.utils.getSnapPosition
@@ -129,6 +130,7 @@ class UpcomingFragment : Fragment(),
     }
 
     private fun setupObservers() {
+        networkCheck()
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 upcomingViewModel.moviesResource.collect {
@@ -136,7 +138,6 @@ class UpcomingFragment : Fragment(),
                         is Resource.Loading -> loading()
                         else -> {}
                     }
-                    networkCheck()
                 }
             }
         }
@@ -177,7 +178,7 @@ class UpcomingFragment : Fragment(),
 
     override fun onMovieClicked(position: Int, imageView: KenBurnsView) {
         val extras = FragmentNavigatorExtras(
-            imageView to position.toString()
+            imageView to position.toString() + "poster"
         )
         imageView.pause()
         val movieResult = upcomingAdapter.currentList[position]

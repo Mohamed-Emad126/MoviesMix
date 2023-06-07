@@ -3,11 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/movie_card"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical|center_horizontal"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
+    android:transitionGroup="true"
     android:animateLayoutChanges="true"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true">

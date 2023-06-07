@@ -28,7 +28,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil.load
-import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.transition.MaterialContainerTransform
 import com.maxrave.kotlinyoutubeextractor.YTExtractor
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.FragmentViewerBinding

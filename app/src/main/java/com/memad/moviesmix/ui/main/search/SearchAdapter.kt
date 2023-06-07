@@ -46,7 +46,7 @@ class SearchAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-        ViewCompat.setTransitionName(holder.itemBinding.searchItemPoster, position.toString())
+        ViewCompat.setTransitionName(holder.itemBinding.searchItemPoster, position.toString() + "poster")
         val movie = getItem(position)!!
         holder.itemBinding.searchItemPoster.load(
             Constants.POSTER_BASE_URL +

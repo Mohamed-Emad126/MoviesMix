@@ -13,7 +13,9 @@ class SuccessMoviesMapper @Inject constructor(private val movieType: Int) :
 
     override fun map(apiSuccessResponse: ApiResponse.Success<MoviesResponse>): List<MovieEntity> {
         return apiSuccessResponse.data.results.map {
-            MovieEntity(it.id, movieType, apiSuccessResponse.data.page, it)
+            MovieEntity(it.id, movieType, apiSuccessResponse.data.page, it.apply {
+                this.backdrop_path = this.backdrop_path?: ""
+            })
         }
     }
 }

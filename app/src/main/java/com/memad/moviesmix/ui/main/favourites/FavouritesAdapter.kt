@@ -2,6 +2,7 @@ package com.memad.moviesmix.ui.main.favourites
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -35,7 +36,11 @@ class FavouritesAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: FavouriteViewHolder, position: Int) {
-        holder.itemBinding.favouriteImage.transitionName = position.toString()
+        ViewCompat.setTransitionName(
+            holder.itemBinding.favouriteImage,
+            position.toString() + "poster"
+        )
+        holder.itemBinding.favouriteImage.transitionName = position.toString() + "poster"
         val movie = getItem(position).movie!!
         holder.itemBinding.favouriteTitle.text = movie.original_title
         holder.itemBinding.favouriteImage.load(

@@ -15,7 +15,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import com.google.android.material.transition.platform.MaterialSharedAxis
+import com.google.android.material.transition.MaterialSharedAxis
 import com.memad.moviesmix.R
 import com.memad.moviesmix.databinding.ActivityMainBinding
 import com.memad.moviesmix.ui.main.search.SearchFragmentDirections

@@ -2,7 +2,6 @@ package com.memad.moviesmix.ui.main.trending
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -47,6 +46,7 @@ class TrendingAdapter @Inject constructor() :
 
 
     override fun onBindViewHolder(holder: TrendingViewHolder, position: Int) {
+        holder.itemBinding.posterImage.transitionName = position.toString() + "poster"
         if (currentList[position].moviePage == -122) {
             holder.itemBinding.itemVeilLayout.veil()
             return
@@ -63,7 +63,6 @@ class TrendingAdapter @Inject constructor() :
                 error(R.drawable.start_img_min_broken)
                 allowHardware(false)
             }
-        ViewCompat.setTransitionName(holder.itemBinding.posterImage, position.toString())
     }
 
     override fun getItemCount(): Int {
@@ -82,7 +81,7 @@ class TrendingAdapter @Inject constructor() :
         init {
             itemBinding.materialCardView.setOnClickListener {
                 trendingMovieClickListener.onMovieClicked(
-                    bindingAdapterPosition,
+                    absoluteAdapterPosition,
                     itemBinding.posterImage
                 )
             }
@@ -102,7 +101,7 @@ class TrendingAdapter @Inject constructor() :
 
 object TrendingDiffCallBack : DiffUtil.ItemCallback<MovieEntity>() {
     override fun areItemsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
-        return newItem == oldItem
+        return newItem.movie == oldItem.movie
     }
 
     override fun areContentsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {

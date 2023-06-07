@@ -1,7 +1,6 @@
 package com.memad.moviesmix.ui.main.popular
 
 import android.app.Dialog
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,8 +18,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.MaterialFadeThrough
 import com.google.gson.Gson
 import com.liaoinstan.springview.widget.SpringView
 import com.memad.moviesmix.R
@@ -58,11 +56,6 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
         super.onCreate(savedInstanceState)
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
-        //exitTransition = MaterialElevationScale(false)
-        sharedElementReturnTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.main_nav_host_fragment
-            scrimColor = Color.TRANSPARENT
-        }
     }
 
     override fun onCreateView(
@@ -86,7 +79,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
     private fun initRecyclerView() {
         binding.moviesRecycler.isSaveEnabled = true
-        binding.moviesRecycler.setHasFixedSize(false)
+        binding.moviesRecycler.setHasFixedSize(true)
         popularAdapter.popularMovieClickListener = this
         binding.moviesRecycler.adapter = popularAdapter
     }
@@ -179,7 +172,9 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
     private fun success() {
         binding.springView.onFinishFreshAndLoad()
-        binding.springView.visibility = View.VISIBLE
+        if (binding.springView.visibility == View.GONE) {
+            binding.springView.visibility = View.VISIBLE
+        }
         binding.loadingLayout.loadingLayout.visibility = View.GONE
         binding.errorLayout.errorLayout.visibility = View.GONE
     }
@@ -214,7 +209,7 @@ class PopularFragment : Fragment(), SpringView.OnFreshListener,
 
     override fun onMovieClicked(position: Int, imageView: ShapeableImageView) {
         val extras = FragmentNavigatorExtras(
-            imageView to position.toString()
+            imageView to position.toString() + "poster"
         )
         findNavController().navigate(
             PopularFragmentDirections.actionPopularFragmentToMovieDescriptionFragment(

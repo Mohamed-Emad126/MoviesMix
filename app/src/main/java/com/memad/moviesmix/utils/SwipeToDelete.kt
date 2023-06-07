@@ -1,4 +1,4 @@
-package com.memad.moviesmix.ui.main.favourites
+package com.memad.moviesmix.utils
 
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper

@@ -13,12 +13,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.google.android.material.transition.MaterialFadeThrough
 import com.google.gson.Gson
 import com.memad.moviesmix.R
 import com.memad.moviesmix.data.local.MovieEntity
 import com.memad.moviesmix.databinding.FragmentFavouritesBinding
 import com.memad.moviesmix.utils.Constants
+import com.memad.moviesmix.utils.setSwipeToDelete
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -95,8 +96,9 @@ class FavouritesFragment : Fragment(), FavouritesAdapter.OnFavouriteEntityClickL
 
     override fun onFavouriteEntityClicked(position: Int, posterImageView: ShapeableImageView) {
         val extras = FragmentNavigatorExtras(
-            posterImageView to position.toString()
+            posterImageView to position.toString() + "poster"
         )
+
         val movieResult = favouritesAdapter.currentList[position]
         findNavController().navigate(
             FavouritesFragmentDirections.actionFavouritesFragmentToMovieDescriptionFragment(
