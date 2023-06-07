@@ -201,5 +201,5 @@ Java_com_memad_moviesmix_utils_AccessNative_getApiKey(JNIEnv *env, jobject thiz)
 
 ## License 📃
 
-This project is licensed under the [LICENSE NAME] License - see the [LICENSE.md](LICENSE.md) file
+This project is licensed under the [MIT License] License - see the [LICENSE](LICENSE) file
 for details.
