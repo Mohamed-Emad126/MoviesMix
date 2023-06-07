@@ -1,7 +1,9 @@
 # MoviesMix 🎥🍿📱
 
 This is an Android app built using Kotlin that showcases various features and libraries. The app
-allows users to [describe the functionality of your app].
+allows users to  explore the latest movies, get detailed information about them and watch their trailers. Users can also like their favourite movies and download their posters and wallpapers. The application also supports dark and light themes and multiple languages.
+
+
 
 ## Features ✨
 * Explore the Upcoming, Popular and Trends Movies ✅
